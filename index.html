@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lucas Chavanne · Systèmes, IoT et self-hosting</title>
+<meta name="description" content="Portfolio de Lucas Chavanne, technicien ES en informatique : administration système, Proxmox, IoT sur Raspberry Pi et Pico 2W, pipelines de données InfluxDB et Grafana.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EEF1F4;
+  --paper-2:#E3E8ED;
+  --ink:#17202A;
+  --ink-soft:#4A5866;
+  --rule:#C9D2DB;
+  --raspberry:#C51A4A;
+  --signal:#2F7F6F;
+  --node:#FFFFFF;
+  --focus:#1D5FD1;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#152029;
+    --paper-2:#1C2A35;
+    --ink:#E6ECF1;
+    --ink-soft:#9DAEBD;
+    --rule:#2E3F4D;
+    --raspberry:#F0507A;
+    --signal:#5CC2AC;
+    --node:#1F2F3B;
+    --focus:#7FB0FF;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#152029;
+  --paper-2:#1C2A35;
+  --ink:#E6ECF1;
+  --ink-soft:#9DAEBD;
+  --rule:#2E3F4D;
+  --raspberry:#F0507A;
+  --signal:#5CC2AC;
+  --node:#1F2F3B;
+  --focus:#7FB0FF;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 72px);scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Archivo",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-variation-settings:"wdth" 100;
+  font-size:1.0625rem;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+img,svg{max-width:100%}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:2px}
+.wrap{max-width:1160px;margin:0 auto;padding:0 clamp(1.25rem,4vw,2.5rem)}
+.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+
+/* Nav */
+.nav{
+  position:sticky;top:env(safe-area-inset-top,0px);z-index:10;
+  background:color-mix(in srgb,var(--paper) 88%,transparent);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--rule);
+}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:1rem;height:60px}
+.brand{font-weight:800;font-variation-settings:"wdth" 120;text-decoration:none;letter-spacing:-.01em;display:flex;align-items:center;gap:.55rem}
+.brand-dot{width:10px;height:10px;border-radius:50%;background:var(--raspberry)}
+.nav ul{display:flex;gap:clamp(.75rem,2.5vw,1.75rem);list-style:none;margin:0;padding:0}
+.nav ul a{text-decoration:none;color:var(--ink-soft);font-size:.95rem}
+.nav ul a:hover{color:var(--ink)}
+.theme-btn{
+  background:none;border:1px solid var(--rule);color:var(--ink);border-radius:999px;
+  width:36px;height:36px;display:grid;place-items:center;cursor:pointer;font-size:1rem;flex:none;
+}
+.nav ul a[aria-current="page"]{color:var(--ink);font-weight:600;box-shadow:inset 0 -2px 0 var(--raspberry)}
+.nav ul a{padding:.35rem 0}
+@media (max-width:720px){
+  .nav .wrap{height:auto;flex-wrap:wrap;padding-top:.6rem;padding-bottom:.2rem;row-gap:.2rem}
+  .nav ul{order:3;width:100%;overflow-x:auto;gap:1.25rem;padding-bottom:.45rem;scrollbar-width:none}
+  .nav ul a{white-space:nowrap}
+}
+.page[hidden]{display:none}
+.page > section:first-child{border-top:none}
+.page-title{padding-top:clamp(2.5rem,6vw,4.5rem)}
+.page-title h2{font-size:clamp(2.6rem,6.5vw,4.6rem);font-variation-settings:"wdth" 125}
+/* Liens vers les pages depuis l'accueil */
+.goto{list-style:none;margin:0;padding:0;border-top:1.5px solid var(--ink)}
+.goto a{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr) 1.5rem;gap:1.25rem;align-items:center;padding:1.4rem .25rem;border-bottom:1px solid var(--rule);text-decoration:none}
+.goto a:hover h3{color:var(--raspberry)}
+.goto h3{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;font-variation-settings:"wdth" 120}
+.goto span{color:var(--ink-soft)}
+.goto b{font-size:1.4rem;text-align:right;font-weight:400}
+@media (max-width:640px){.goto a{grid-template-columns:1fr 1.5rem}.goto span{grid-column:1;grid-row:2}.goto b{grid-column:2;grid-row:1}}
+
+/* Hero */
+.hero{padding:clamp(2.5rem,7vw,5.5rem) 0 clamp(2rem,5vw,4rem)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(2rem,5vw,4rem);align-items:center}
+@media (max-width:900px){.hero-grid{grid-template-columns:1fr}}
+.hero h1{
+  font-size:clamp(2.6rem,7vw,5.2rem);line-height:.95;margin:0 0 1.5rem;
+  font-weight:800;font-variation-settings:"wdth" 125;letter-spacing:-.025em;
+}
+.hero h1 span{display:block;font-weight:400;font-variation-settings:"wdth" 75;letter-spacing:0;color:var(--ink-soft);font-size:.42em;line-height:1.2;margin-top:.9rem}
+.lede{font-size:clamp(1.1rem,1.6vw,1.3rem);max-width:34ch;margin:0 0 2rem;line-height:1.5}
+.cta-row{display:flex;flex-wrap:wrap;gap:.75rem}
+.btn{
+  display:inline-flex;align-items:center;gap:.5rem;padding:.8rem 1.25rem;border-radius:6px;
+  font-weight:600;text-decoration:none;border:1.5px solid var(--ink);font-size:.98rem;
+}
+.btn-primary{background:var(--ink);color:var(--paper)}
+.btn-primary:hover{background:var(--raspberry);border-color:var(--raspberry);color:#fff}
+.btn-ghost:hover{background:var(--paper-2)}
+
+/* Topology */
+.topo{
+  margin:0;background:var(--paper-2);border:1px solid var(--rule);border-radius:14px;padding:1rem 1rem .75rem;
+  background-image:radial-gradient(var(--rule) 1px,transparent 1px);background-size:18px 18px;
+}
+.topo-head{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin:0 .25rem .5rem;font-size:.85rem;color:var(--ink-soft)}
+.topo-head strong{color:var(--ink);font-weight:600}
+.live{display:inline-flex;align-items:center;gap:.4rem}
+.live::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--signal)}
+.topo svg{display:block;width:100%;height:auto}
+.n rect{fill:var(--node);stroke:var(--ink);stroke-width:1.25}
+.n.broker rect{fill:var(--ink)}
+.n.broker text{fill:var(--paper)}
+.n text{fill:var(--ink);font-family:"Archivo",sans-serif;font-size:13px;font-weight:600;text-anchor:middle}
+.n text.sub{font-weight:400;font-size:10.5px;fill:var(--ink-soft)}
+.n.broker text.sub{fill:var(--paper);opacity:.75}
+.wire{fill:none;stroke:var(--ink-soft);stroke-width:1.25;stroke-dasharray:3 4}
+.pkt{fill:var(--raspberry)}
+.pkt.ok{fill:var(--signal)}
+.log{
+  margin:.6rem .25rem 0;padding:.6rem .75rem;border-top:1px solid var(--rule);
+  font-size:.78rem;line-height:1.65;min-height:6.6em;color:var(--ink-soft);overflow:hidden;
+}
+.log div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.log .t{color:var(--signal)}
+.log .v{color:var(--ink)}
+.note{font-size:.75rem;color:var(--ink-soft);margin:.35rem .25rem 0}
+
+/* Sections */
+section{padding:clamp(3rem,8vw,6rem) 0;border-top:1px solid var(--rule)}
+.sec-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:clamp(1rem,4vw,3rem);margin-bottom:clamp(2rem,4vw,3rem);align-items:end}
+@media (max-width:800px){.sec-head{grid-template-columns:1fr}}
+h2{font-size:clamp(2rem,4.5vw,3.2rem);line-height:1;margin:0;font-weight:800;font-variation-settings:"wdth" 118;letter-spacing:-.02em}
+.sec-head p{margin:0;color:var(--ink-soft);max-width:56ch}
+h3{margin:0;font-variation-settings:"wdth" 110;letter-spacing:-.01em;line-height:1.15}
+
+/* About */
+.about-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:clamp(2rem,5vw,4rem)}
+@media (max-width:800px){.about-grid{grid-template-columns:1fr}}
+.about-grid p{margin:0 0 1.1rem;max-width:62ch}
+.facts{margin:0;display:grid;gap:1.1rem;align-content:start}
+.facts div{border-left:3px solid var(--raspberry);padding-left:1rem}
+.facts dt{font-size:.85rem;color:var(--ink-soft)}
+.facts dd{margin:0;font-weight:600}
+
+/* Featured project */
+.feature{
+  border:1.5px solid var(--ink);border-radius:14px;overflow:hidden;margin-bottom:clamp(2rem,4vw,3rem);
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+}
+@media (max-width:900px){.feature{grid-template-columns:1fr}}
+.feature-body{padding:clamp(1.5rem,3.5vw,2.75rem)}
+.feature-body h3{font-size:clamp(2rem,4vw,2.8rem);font-weight:800;font-variation-settings:"wdth" 125;margin-bottom:.35rem}
+.tag{display:inline-block;font-size:.8rem;padding:.2rem .6rem;border-radius:999px;background:var(--raspberry);color:#fff;font-weight:600;margin-bottom:1rem}
+.feature-body p{margin:0 0 1.25rem;max-width:52ch}
+.feature ul.points{margin:0 0 1.5rem;padding-left:1.1rem}
+.feature ul.points li{margin-bottom:.4rem}
+.feature-side{background:var(--ink);color:var(--paper);padding:clamp(1.5rem,3.5vw,2.75rem);display:flex;flex-direction:column;gap:1.25rem}
+.feature-side h4{margin:0;font-size:1rem;font-variation-settings:"wdth" 110}
+.flow{list-style:none;margin:0;padding:0;display:grid;gap:.5rem}
+.flow li{display:grid;grid-template-columns:7rem 1fr;gap:.75rem;padding:.55rem 0;border-bottom:1px solid color-mix(in srgb,var(--paper) 18%,transparent);font-size:.95rem}
+.flow li b{font-weight:600}
+.flow li span{opacity:.78}
+details.learn{border-top:1px solid color-mix(in srgb,var(--paper) 25%,transparent);padding-top:1rem}
+details.learn summary{cursor:pointer;font-weight:600}
+details.learn ul{margin:.75rem 0 0;padding-left:1.1rem;opacity:.85;font-size:.93rem}
+details.learn li{margin-bottom:.45rem}
+
+/* Filters + project list */
+.filters{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.5rem}
+.filters button{
+  font:inherit;font-size:.93rem;padding:.45rem 1rem;border-radius:999px;cursor:pointer;
+  border:1.5px solid var(--rule);background:transparent;color:var(--ink);
+}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.plist{list-style:none;margin:0;padding:0;border-top:1.5px solid var(--ink)}
+.proj{border-bottom:1px solid var(--rule)}
+.proj[hidden]{display:none}
+.proj button.row{
+  all:unset;box-sizing:border-box;cursor:pointer;width:100%;
+  display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1.8fr) 7.5rem 1.5rem;gap:1.25rem;align-items:center;
+  padding:1.2rem .25rem;
+}
+.proj button.row:focus-visible{outline:3px solid var(--focus);outline-offset:-3px}
+.proj button.row:hover h3{color:var(--raspberry)}
+.proj h3{font-size:1.3rem}
+.proj .sum{color:var(--ink-soft);font-size:.97rem}
+.proj .cat{font-size:.85rem;color:var(--ink-soft)}
+.proj .chev{font-size:1.3rem;transition:transform .2s ease;text-align:right}
+.proj.open .chev{transform:rotate(45deg)}
+@media (prefers-reduced-motion: reduce){.proj .chev{transition:none}}
+@media (max-width:760px){
+  .proj button.row{grid-template-columns:1fr 1.5rem;gap:.35rem 1rem}
+  .proj .sum{grid-column:1;grid-row:2}
+  .proj .cat{display:none}
+  .proj .chev{grid-column:2;grid-row:1}
+}
+.proj .more{padding:0 .25rem 1.5rem;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1.8fr) 7.5rem 1.5rem;gap:1.25rem}
+.proj .more > div{grid-column:2 / span 2}
+.proj .more[hidden]{display:none}
+@media (max-width:760px){.proj .more{grid-template-columns:1fr}.proj .more > div{grid-column:1}}
+.proj .more p{margin:0 0 .75rem;max-width:60ch}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem;list-style:none;padding:0;margin:0}
+.chips li{font-size:.82rem;padding:.2rem .6rem;border:1px solid var(--rule);border-radius:4px;background:var(--paper-2)}
+.status{font-size:.85rem;color:var(--signal);font-weight:600}
+
+/* Stack layers */
+.layers{list-style:none;margin:0;padding:0}
+.layer{
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2.2fr);gap:1.5rem;
+  padding:1.3rem 0;border-bottom:1px solid var(--rule);align-items:start;
+}
+.layer:first-child{border-top:1.5px solid var(--ink)}
+@media (max-width:700px){.layer{grid-template-columns:1fr;gap:.6rem}}
+.layer h3{font-size:1.15rem}
+.layer .why{display:block;font-size:.88rem;color:var(--ink-soft);font-weight:400;font-variation-settings:"wdth" 100;margin-top:.25rem;letter-spacing:0}
+.layer .chips li{font-size:.92rem;padding:.3rem .75rem;background:var(--node)}
+.layer .chips li.key{border-color:var(--ink);font-weight:600}
+.stack-foot{margin-top:1rem;font-size:.9rem;color:var(--ink-soft)}
+.stack-foot b{color:var(--ink)}
+
+/* Stack en cards */
+.sgroup{margin-bottom:clamp(2rem,4vw,3rem)}
+.sgroup[hidden]{display:none}
+.sgroup-head{display:flex;align-items:baseline;gap:1rem;flex-wrap:wrap;padding-bottom:.75rem;margin-bottom:1rem;border-bottom:1.5px solid var(--ink)}
+.sgroup-head h3{font-size:1.4rem;font-weight:800;font-variation-settings:"wdth" 118}
+.sgroup-head span{color:var(--ink-soft);font-size:.95rem}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:.85rem;list-style:none;margin:0;padding:0}
+.tcard{
+  position:relative;background:var(--node);border:1px solid var(--rule);border-radius:10px;
+  padding:1rem 1rem 1.05rem;display:grid;grid-template-columns:44px 1fr;gap:.85rem;align-items:start;
+}
+.tcard .ico{
+  width:44px;height:44px;border-radius:9px;display:grid;place-items:center;
+  background:var(--paper-2);color:var(--ink);
+}
+.tcard .ico svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.tcard.key{border-color:var(--ink)}
+.tcard.key .ico{background:var(--raspberry);color:#fff}
+.tcard.key::after{content:"";position:absolute;top:.8rem;right:.8rem;width:7px;height:7px;border-radius:50%;background:var(--raspberry)}
+.tcard b{display:block;font-weight:700;font-variation-settings:"wdth" 108;line-height:1.25;padding-right:.8rem}
+.tcard small{display:block;color:var(--ink-soft);font-size:.87rem;line-height:1.4;margin-top:.2rem}
+.legend{display:flex;align-items:center;gap:.5rem;font-size:.88rem;color:var(--ink-soft);margin:-0.5rem 0 1.75rem}
+.legend i{width:7px;height:7px;border-radius:50%;background:var(--raspberry);display:inline-block}
+
+/* Timeline */
+.timeline{list-style:none;margin:0;padding:0 0 0 1.75rem;position:relative;max-width:760px}
+.timeline::before{content:"";position:absolute;left:5px;top:.5rem;bottom:.5rem;width:2px;background:var(--rule)}
+.timeline li{position:relative;padding-bottom:2.25rem}
+.timeline li:last-child{padding-bottom:0}
+.timeline li::before{content:"";position:absolute;left:-1.75rem;top:.45rem;width:12px;height:12px;border-radius:50%;background:var(--paper);border:2px solid var(--ink)}
+.timeline li.now::before{background:var(--raspberry);border-color:var(--raspberry)}
+.timeline .when{font-size:.88rem;color:var(--ink-soft)}
+.timeline h3{font-size:1.25rem;margin:.15rem 0 .35rem}
+.timeline p{margin:0;max-width:60ch}
+
+/* Contact */
+.contact{background:var(--ink);color:var(--paper);border-top:none}
+.contact h2{font-size:clamp(2.4rem,6vw,4.4rem);font-variation-settings:"wdth" 125;max-width:14ch}
+.contact p{color:color-mix(in srgb,var(--paper) 78%,transparent);max-width:52ch;margin:1.25rem 0 2rem}
+.contact-links{display:flex;flex-wrap:wrap;gap:.75rem}
+.contact .btn{border-color:var(--paper);color:var(--paper)}
+.contact .btn-primary{background:var(--paper);color:var(--ink)}
+.contact .btn-primary:hover{background:var(--raspberry);border-color:var(--raspberry);color:#fff}
+.contact .btn-ghost:hover{background:color-mix(in srgb,var(--paper) 12%,transparent)}
+footer{background:var(--ink);color:color-mix(in srgb,var(--paper) 60%,transparent);font-size:.85rem;padding:1.5rem 0 2rem;border-top:1px solid color-mix(in srgb,var(--paper) 15%,transparent)}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+</style>
+</head>
+<body>
+
+<nav class="nav" aria-label="Navigation principale">
+  <div class="wrap">
+    <a href="#/" class="brand"><span class="brand-dot" aria-hidden="true"></span>Lucas Chavanne</a>
+    <ul>
+      <li><a href="#/" data-nav="accueil">Accueil</a></li>
+      <li><a href="#/projets" data-nav="projets">Projets</a></li>
+      <li><a href="#/stack" data-nav="stack">Stack</a></li>
+      <li><a href="#/parcours" data-nav="parcours">Parcours</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Changer de thème">◐</button>
+  </div>
+</nav>
+
+<main id="top">
+<div class="page" data-page="accueil" data-title="Lucas Chavanne · Systèmes, IoT et self-hosting">
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <h1>Lucas Chavanne<span>Technicien ES en informatique, Genève</span></h1>
+        <p class="lede">Je construis des systèmes qui tournent chez moi, sans cloud : du capteur branché sur une Pico jusqu'au dashboard Grafana, en passant par le serveur Proxmox qui héberge tout.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#/projets">Voir les projets</a>
+          <a class="btn btn-ghost" href="https://gitlab.com/lucgta5.chavanne" target="_blank" rel="noopener">GitLab</a>
+        </div>
+      </div>
+
+      <figure class="topo" aria-labelledby="topoCap">
+        <div class="topo-head">
+          <span id="topoCap"><strong>Domo</strong>, le flux de données de mon TPI</span>
+          <span class="live">en direct</span>
+        </div>
+        <svg viewBox="0 0 600 420" role="img" aria-label="Architecture Domo : la Pico 2W, la Pi Zero 2W et les prises Shelly publient sur le broker Mosquitto du Raspberry Pi 5, qui alimente Telegraf, InfluxDB et Grafana, ainsi que l'API Flask qui envoie les alertes via ntfy.">
+          <path id="w1" class="wire" d="M150 80 C 190 80, 190 200, 225 205"/>
+          <path id="w2" class="wire" d="M150 210 L 225 210"/>
+          <path id="w3" class="wire" d="M150 340 C 190 340, 190 220, 225 215"/>
+          <path id="w4" class="wire" d="M375 205 C 405 205, 405 70, 435 70"/>
+          <path id="w5" class="wire" d="M500 93 L 500 147"/>
+          <path id="w6" class="wire" d="M375 215 C 405 215, 405 270, 435 270"/>
+          <path id="w7" class="wire" d="M500 293 L 500 337"/>
+
+          <g class="n"><rect x="20" y="57" width="130" height="46" rx="6"/><text x="85" y="77">Pico 2W</text><text class="sub" x="85" y="92">capteurs</text></g>
+          <g class="n"><rect x="20" y="187" width="130" height="46" rx="6"/><text x="85" y="207">Pi Zero 2W</text><text class="sub" x="85" y="222">PIR + caméra</text></g>
+          <g class="n"><rect x="20" y="317" width="130" height="46" rx="6"/><text x="85" y="337">Shelly</text><text class="sub" x="85" y="352">prises connectées</text></g>
+          <g class="n broker"><rect x="225" y="182" width="150" height="56" rx="8"/><text x="300" y="206">Mosquitto</text><text class="sub" x="300" y="223">Raspberry Pi 5</text></g>
+          <g class="n"><rect x="435" y="47" width="130" height="46" rx="6"/><text x="500" y="67">Telegraf</text><text class="sub" x="500" y="82">collecte</text></g>
+          <g class="n"><rect x="435" y="147" width="130" height="46" rx="6"/><text x="500" y="167">InfluxDB</text><text class="sub" x="500" y="182">+ Grafana</text></g>
+          <g class="n"><rect x="435" y="247" width="130" height="46" rx="6"/><text x="500" y="267">API Flask</text><text class="sub" x="500" y="282">logique, OTA</text></g>
+          <g class="n"><rect x="435" y="337" width="130" height="46" rx="6"/><text x="500" y="357">ntfy</text><text class="sub" x="500" y="372">notifications</text></g>
+          <g id="pkts"></g>
+        </svg>
+        <div class="log mono" id="log"></div>
+        <figcaption class="note">Messages MQTT simulés, sur le modèle des topics du projet.</figcaption>
+      </figure>
+    </div>
+  </header>
+
+  <section id="apropos">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>À propos</h2>
+        <p>Administrateur système par formation, bricoleur d'électronique par goût.</p>
+      </div>
+      <div class="about-grid">
+        <div>
+          <p>Je viens de terminer mon diplôme de technicien ES en informatique au CFPT Genève et je commence la HEG Genève en septembre 2026. Ce qui m'intéresse, c'est l'ensemble de la chaîne : choisir le matériel, écrire le firmware, faire circuler les données proprement et les rendre lisibles.</p>
+          <p>La plupart de mes projets tournent sur mon propre serveur Proxmox. J'y héberge mon GitLab avec ses pipelines CI/CD, mes services multimédia et ma domotique. Quand quelque chose casse, c'est à moi de le réparer, et c'est justement là que j'apprends le plus.</p>
+          <p>Mon travail de diplôme, Domo, résume bien cette approche : un système domotique complet, entièrement local et open source, que j'ai conçu du câblage des capteurs jusqu'au déploiement automatisé.</p>
+        </div>
+        <dl class="facts">
+          <div><dt>Diplôme</dt><dd>Technicien ES en informatique, CFPT Genève</dd></div>
+          <div><dt>Dès septembre 2026</dt><dd>Étudiant à la HEG Genève</dd></div>
+          <div><dt>Région</dt><dd>Genève, frontière franco-suisse</dd></div>
+          <div><dt>Terrain de jeu</dt><dd>Serveurs Linux, virtualisation, IoT, données temporelles</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Explorer</h2>
+        <p>Le site est découpé en pages pour aller droit à ce qui t'intéresse.</p>
+      </div>
+      <ul class="goto">
+        <li><a href="#/projets"><h3>Projets</h3><span>Neuf projets, dont mon travail de diplôme Domo, filtrables par domaine.</span><b aria-hidden="true">›</b></a></li>
+        <li><a href="#/stack"><h3>Stack technique</h3><span>Les outils que j'utilise, rangés du matériel jusqu'au déploiement.</span><b aria-hidden="true">›</b></a></li>
+        <li><a href="#/parcours"><h3>Parcours</h3><span>Du CFPT Genève à la HEG, en passant par mon stage.</span><b aria-hidden="true">›</b></a></li>
+      </ul>
+    </div>
+  </section>
+</div>
+
+<div class="page" data-page="projets" data-title="Projets · Lucas Chavanne" hidden>
+  <section id="projets" class="page-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Projets</h2>
+        <p>Des projets d'école, de diplôme et perso. Clique sur une ligne pour voir les détails.</p>
+      </div>
+
+      <article class="feature" aria-labelledby="domoTitle">
+        <div class="feature-body">
+          <span class="tag">Travail de diplôme (TPI)</span>
+          <h3 id="domoTitle">Domo</h3>
+          <p>Un système domotique entièrement local et open source. Des capteurs sur Pico 2W et Pi Zero 2W publient leurs mesures en MQTT vers un Raspberry Pi 5 qui stocke, affiche et réagit, sans aucun service cloud.</p>
+          <ul class="points">
+            <li>Capteurs de lumière, son, fuite d'eau et mouvement, avec capture caméra à la détection</li>
+            <li>Prises Shelly pilotées et mesurées depuis la même interface</li>
+            <li>Mise à jour du firmware des Pico à distance (OTA)</li>
+            <li>Alertes sur le téléphone via ntfy</li>
+            <li>Pipeline GitLab CI pour tester et déployer</li>
+          </ul>
+          <ul class="chips" aria-label="Technologies">
+            <li>Raspberry Pi 5</li><li>Pico 2W</li><li>MicroPython</li><li>Mosquitto</li><li>Telegraf</li><li>InfluxDB</li><li>Grafana</li><li>Flask</li><li>GitLab CI</li>
+          </ul>
+        </div>
+        <div class="feature-side">
+          <h4>Le trajet d'une mesure</h4>
+          <ol class="flow">
+            <li><b>Capteur</b><span>La Pico 2W lit le capteur et publie sur un topic MQTT.</span></li>
+            <li><b>Broker</b><span>Mosquitto sur le Pi 5 reçoit et redistribue.</span></li>
+            <li><b>Stockage</b><span>Telegraf écrit la mesure dans InfluxDB.</span></li>
+            <li><b>Affichage</b><span>Grafana trace l'historique en temps réel.</span></li>
+            <li><b>Réaction</b><span>L'API Flask déclenche l'action ou l'alerte ntfy.</span></li>
+          </ol>
+          <details class="learn">
+            <summary>Ce que le matériel m'a appris</summary>
+            <ul>
+              <li>La broche 3V3 du Pi plafonne vers 300 mA : au-delà, un régulateur externe s'impose.</li>
+              <li>Les pics d'émission Wi-Fi de la Pico demandent un condensateur de 470 µF plus 100 nF pour rester stable.</li>
+              <li>Un simple transistor NPN et une résistance suffisent pour piloter un ventilateur, pas besoin de relais.</li>
+              <li>La Camera Module 3 ne se détecte pas seule : il faut forcer l'overlay imx708.</li>
+            </ul>
+          </details>
+        </div>
+      </article>
+
+      <div class="filters" role="group" aria-label="Filtrer les projets">
+        <button type="button" data-f="all" aria-pressed="true">Tous</button>
+        <button type="button" data-f="infra" aria-pressed="false">Infrastructure</button>
+        <button type="button" data-f="iot" aria-pressed="false">IoT</button>
+        <button type="button" data-f="dev" aria-pressed="false">Développement</button>
+      </div>
+
+      <ul class="plist" id="plist"></ul>
+    </div>
+  </section>
+
+</div>
+
+<div class="page" data-page="stack" data-title="Stack technique · Lucas Chavanne" hidden>
+  <section id="stack" class="page-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Stack technique</h2>
+        <p>Les outils que j'utilise, avec ce que j'en fais concrètement. Ceux marqués d'une pastille sont mes outils du quotidien.</p>
+      </div>
+      <div class="sfilters filters" role="group" aria-label="Filtrer la stack">
+        <button type="button" data-g="all" aria-pressed="true">Tout</button>
+      </div>
+      <div id="stackGrid"></div>
+    </div>
+  </section>
+
+</div>
+
+<div class="page" data-page="parcours" data-title="Parcours · Lucas Chavanne" hidden>
+  <section id="parcours" class="page-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Parcours</h2>
+        <p>Les étapes qui m'ont mené jusqu'ici.</p>
+      </div>
+      <ol class="timeline">
+        <li>
+          <span class="when">Formation</span>
+          <h3>CFPT Genève, technicien ES en informatique</h3>
+          <p>Administration de serveurs Linux et Windows, virtualisation, réseaux, développement. Projets d'école dont le coffre connecté Portkey Coffer et un comparatif Proxmox et VMware ESXi.</p>
+        </li>
+        <li>
+          <span class="when">Pendant la formation</span>
+          <h3>Stage chez Genève Roule</h3>
+          <p>Première expérience en entreprise, présentée ensuite en anglais lors de l'examen oral.</p>
+        </li>
+        <li>
+          <span class="when">2026</span>
+          <h3>Diplôme et travail de diplôme Domo</h3>
+          <p>Conception et réalisation d'un système domotique local complet, du matériel au pipeline CI.</p>
+        </li>
+        <li class="now">
+          <span class="when">Septembre 2026</span>
+          <h3>HEG Genève</h3>
+          <p>Nouvelle étape de formation, en parallèle de mes projets d'infrastructure à la maison.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+</div>
+
+  <section id="contact" class="contact">
+    <div class="wrap">
+      <h2>On en parle ?</h2>
+      <p>Je suis ouvert aux stages, jobs étudiants et projets en administration système, IoT ou DevOps dans la région genevoise.</p>
+      <div class="contact-links">
+        <a class="btn btn-primary" href="mailto:lucas.chavanne.info@gmail.com">Écrire un e-mail</a>
+        <a class="btn btn-ghost" href="https://gitlab.com/lucgta5.chavanne" target="_blank" rel="noopener">Mon GitLab</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Lucas Chavanne, 2026</span>
+    <span>Site écrit à la main, sans framework.</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* Thème */
+  var root=document.documentElement, btn=document.getElementById('themeBtn');
+  try{var saved=localStorage.getItem('theme'); if(saved) root.setAttribute('data-theme',saved);}catch(e){}
+  btn.addEventListener('click',function(){
+    var cur=root.getAttribute('data-theme');
+    if(!cur){cur=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+    var next=cur==='dark'?'light':'dark';
+    root.setAttribute('data-theme',next);
+    try{localStorage.setItem('theme',next);}catch(e){}
+  });
+
+  /* Pages */
+  var pages=document.querySelectorAll('.page'), navLinks=document.querySelectorAll('[data-nav]');
+  var current='accueil';
+  function route(){
+    var h=location.hash;
+    if(h && h.indexOf('#/')!==0) return; /* ancre interne, ex. #contact */
+    var name=(h||'#/').slice(2)||'accueil', found=false;
+    pages.forEach(function(pg){ if(pg.dataset.page===name) found=true; });
+    if(!found) name='accueil';
+    pages.forEach(function(pg){
+      var on=pg.dataset.page===name; pg.hidden=!on;
+      if(on) document.title=pg.dataset.title;
+    });
+    navLinks.forEach(function(a){ if(a.dataset.nav===name) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
+    if(name!==current) window.scrollTo(0,0);
+    current=name;
+  }
+  window.addEventListener('hashchange',route); route();
+
+  /* Stack */
+  var I={
+    chip:'<rect x="6" y="6" width="12" height="12" rx="1.5"/><rect x="9.5" y="9.5" width="5" height="5"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/>',
+    board:'<rect x="2.5" y="5" width="19" height="14" rx="2"/><rect x="6" y="8.5" width="5" height="5"/><path d="M14 9h4M14 12h4M14 15h2"/>',
+    server:'<rect x="3" y="3.5" width="18" height="7" rx="1.5"/><rect x="3" y="13.5" width="18" height="7" rx="1.5"/><path d="M7 7h.01M7 17h.01M11 7h6M11 17h6"/>',
+    layers:'<path d="M12 3 3 7.5 12 12l9-4.5L12 3z"/><path d="M3 12l9 4.5 9-4.5M3 16.5 12 21l9-4.5"/>',
+    term:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3M12.5 15H17"/>',
+    monitor:'<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/>',
+    box:'<path d="M21 8 12 3 3 8v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5M12 13v8"/>',
+    db:'<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',
+    folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/><path d="M9 13.5h6"/>',
+    net:'<circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5v4M12 11.5 5.5 16.8M12 11.5l6.5 5.3"/>',
+    key:'<circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3M14.5 8.5l2 2"/>',
+    wall:'<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9.3h18M3 14.7h18M9 4v5.3M15 9.3v5.4M9 14.7V20"/>',
+    ban:'<circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/>',
+    flask:'<path d="M9 3h6M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/><path d="M7.5 15h9"/>',
+    code:'<path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/>',
+    blocks:'<rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><path d="M17.25 13.5v7.5M13.5 17.25H21"/>',
+    type:'<path d="M4 7V5h16v2M12 5v14M9 19h6"/>',
+    check:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="m7.5 12 3 3 6-6"/>',
+    funnel:'<path d="M3 4h18l-7 8.5V19l-4 2v-8.5L3 4z"/>',
+    chart:'<path d="M3 3v18h18"/><path d="m7 15 4-5 3 3 5-7"/>',
+    radio:'<circle cx="12" cy="12" r="2"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2"/>',
+    hub:'<circle cx="12" cy="12" r="3"/><circle cx="4" cy="5" r="1.8"/><circle cx="20" cy="5" r="1.8"/><circle cx="4" cy="19" r="1.8"/><circle cx="20" cy="19" r="1.8"/><path d="m5.5 6.2 4.2 3.9M18.5 6.2l-4.2 3.9M5.5 17.8l4.2-3.9M18.5 17.8l-4.2-3.9"/>',
+    mesh:'<circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="19" r="2"/><path d="M7 6h10M6 8l5 9M18 8l-5 9"/>',
+    bell:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4l2-2z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
+    branch:'<circle cx="6" cy="5" r="2.2"/><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="8" r="2.2"/><path d="M6 7.2v9.6M18 10.2c0 4-6 3-11 7"/>',
+    loop:'<path d="M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5"/>',
+    ota:'<path d="M12 3v10M8 9l4 4 4-4"/><rect x="5" y="16" width="14" height="5" rx="1"/>',
+    eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+    cam:'<path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/>',
+    plug:'<path d="M9 3v5M15 3v5M6 8h12v3a6 6 0 0 1-12 0V8zM12 17v4"/>',
+    house:'<path d="M3 11 12 4l9 7M5 9.5V20h14V9.5"/><path d="M10 20v-5h4v5"/>',
+    play:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="m10 9 5 3-5 3V9z"/>'
+  };
+  var groups=[
+    {id:'infra',t:'Infrastructure',w:'Là où tout tourne',items:[
+      ['Proxmox VE','layers','Hyperviseur de mon serveur maison',1],
+      ['Debian / Linux','term','Serveurs, installation bare-metal',1],
+      ['Windows Server','monitor','Administration pendant la formation'],
+      ['LXC','box','Plex et Samba en conteneurs'],
+      ['LVM et RAID','db','Stockage du serveur, contrôleur MegaRAID'],
+      ['Samba','folder','Partage de fichiers à la maison'],
+      ['Réseau et bridges','net','Plusieurs bridges sur Proxmox']]},
+    {id:'secu',t:'Sécurité',w:'Durcir ce qui est exposé',items:[
+      ['SSH','key','Accès par clés, configuration durcie',1],
+      ['UFW','wall','Pare-feu des serveurs Debian'],
+      ['Fail2Ban','ban','Blocage des tentatives de connexion']]},
+    {id:'devops',t:'Livraison',w:'Versionner, tester, déployer',items:[
+      ['GitLab self-hosted','branch','Mon instance, hébergée sur Proxmox',1],
+      ['GitLab CI/CD','loop','Tests et déploiement de Domo',1],
+      ['Mises à jour OTA','ota','Firmware des Pico mis à jour à distance']]},
+    {id:'data',t:'Données',w:'Stocker et visualiser des séries temporelles',items:[
+      ['InfluxDB','db','Mesures des capteurs de Domo',1],
+      ['Telegraf','funnel','Collecte des messages MQTT',1],
+      ['Grafana','chart','Dashboards en temps réel',1]]},
+    {id:'iot',t:'IoT et transport',w:'Du capteur au broker',items:[
+      ['MQTT','radio','Protocole de tous mes projets connectés',1],
+      ['Mosquitto','hub','Broker sur le Raspberry Pi 5'],
+      ['Zigbee2MQTT','mesh','Volets motorisés de la maison'],
+      ['ntfy','bell','Alertes sur le téléphone'],
+      ['MicroPython','chip','Firmware des Pico 2W',1],
+      ['OpenCV','eye','Vision sur Raspberry Pi']]},
+    {id:'dev',t:'Développement',w:'Logique et interfaces',items:[
+      ['Flask','flask','API de Domo et de Portkey Coffer',1],
+      ['Python','code','Scripts, API et automatisation',1],
+      ['PHP','code','Développement web'],
+      ['C#','code','Application de bureau Windows'],
+      ['React','blocks','Pokédex avec React Router'],
+      ['TypeScript','type','Typage du Pokédex'],
+      ['Jest','check','Tests unitaires']]},
+    {id:'hw',t:'Matériel',w:'Les machines physiques',items:[
+      ['Raspberry Pi 5','board','Cœur de Domo',1],
+      ['Pico 2W','chip','Capteurs lumière, son et eau',1],
+      ['Pi Zero 2W','board','Détecteur PIR et caméra'],
+      ['ESP32','chip','Projets domotiques'],
+      ['Camera Module 3','cam','Capture à la détection de mouvement'],
+      ['Shelly','plug','Prises pilotées et mesurées'],
+      ['Hitachi CR210H','server','Mon serveur Proxmox']]},
+    {id:'home',t:'Services maison',w:'Ce qui tourne chez moi',items:[
+      ['Home Assistant','house','Domotique de la maison'],
+      ['Plex','play','Serveur multimédia'],
+      ['Nextcloud','folder','Fichiers auto-hébergés']]}
+  ];
+  var sg=document.getElementById('stackGrid'), sf=document.querySelector('.sfilters');
+  sg.insertAdjacentHTML('beforebegin','<p class="legend"><i aria-hidden="true"></i>Outil du quotidien</p>');
+  groups.forEach(function(gr){
+    var b=document.createElement('button');b.type='button';b.dataset.g=gr.id;b.setAttribute('aria-pressed','false');b.textContent=gr.t;sf.appendChild(b);
+    var html='<div class="sgroup" data-g="'+gr.id+'"><div class="sgroup-head"><h3>'+gr.t+'</h3><span>'+gr.w+'</span></div><ul class="sgrid">';
+    gr.items.forEach(function(it){
+      html+='<li class="tcard'+(it[3]?' key':'')+'"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24">'+I[it[1]]+'</svg></span><span><b>'+it[0]+'</b><small>'+it[2]+'</small></span></li>';
+    });
+    sg.insertAdjacentHTML('beforeend',html+'</ul></div>');
+  });
+  var sbtns=sf.querySelectorAll('button');
+  sbtns.forEach(function(b){b.addEventListener('click',function(){
+    sbtns.forEach(function(x){x.setAttribute('aria-pressed','false')});b.setAttribute('aria-pressed','true');
+    sg.querySelectorAll('.sgroup').forEach(function(d){d.hidden=!(b.dataset.g==='all'||d.dataset.g===b.dataset.g)});
+  })});
+
+  /* Projets */
+  var projects=[
+    {id:'proxmox',t:'Serveur Proxmox maison',s:'Serveur de virtualisation qui héberge tous mes services.',c:'infra',cl:'Infrastructure',
+     d:"Installation et administration d'un serveur Hitachi CR210H avec contrôleur MegaRAID. Stockage en LVM et RAID, plusieurs VM et conteneurs (Plex, Nextcloud, GitLab, hébergement web) et une configuration réseau avec plusieurs bridges.",
+     k:['Proxmox VE','MegaRAID','LVM','RAID','Nextcloud','GitLab','Réseau']},
+    {id:'ha',t:'Domotique de la maison',s:"Home Assistant, volets Zigbee et plans d'étage.",c:'infra',cl:'Infrastructure',st:'En cours',
+     d:"Refonte de la domotique familiale autour de Home Assistant OS en VM sur Proxmox. Plex et un partage Samba en conteneurs LXC, coordinateur Zigbee réseau pour piloter les volets motorisés, et plans d'étage en SVG redessinés à partir des plans d'architecte au 1/50e.",
+     k:['Home Assistant','Zigbee2MQTT','LXC','Samba','Plex','SVG']},
+    {id:'coffer',t:'Portkey Coffer',s:'Coffre-fort connecté avec voix et reconnaissance faciale.',c:'iot',cl:'IoT',
+     d:"Projet d'école : un coffre qui s'ouvre par reconnaissance faciale et commande vocale (speech-to-text). Les éléments communiquent en MQTT, avec une API Flask côté serveur et du MicroPython sur le microcontrôleur.",
+     k:['MicroPython','MQTT','Flask','Reconnaissance faciale','Speech-to-text']},
+    {id:'gitlab',t:'Migration GitLab',s:"54 projets déplacés d'une instance privée vers GitLab.com.",c:'infra',cl:'Infrastructure',
+     d:"Migration de 54 dépôts depuis le GitLab auto-hébergé de l'école vers GitLab.com.",
+     k:['GitLab','Git','Migration']},
+    {id:'kb',t:'kb-sysman',s:'Comparatif documenté entre Proxmox et VMware ESXi.',c:'infra',cl:'Infrastructure',
+     d:"Base de connaissances réalisée au CFPT sur les deux hyperviseurs : installation, fonctionnalités, limites, et critères pour choisir selon le contexte.",
+     k:['Proxmox','VMware ESXi','Documentation']},
+    {id:'debian',t:'Debian 13 de zéro',s:"Installation bare-metal et durcissement d'un serveur.",c:'infra',cl:'Infrastructure',
+     d:"Préparation d'un examen d'installation sur machine physique : IP statique, SSH durci, pare-feu UFW et Fail2Ban. J'en ai tiré une fiche mémo réutilisable.",
+     k:['Debian 13','SSH','UFW','Fail2Ban']},
+    {id:'pokedex',t:'Pokédex',s:'Application React et TypeScript testée avec Jest.',c:'dev',cl:'Développement',
+     d:"Projet d'examen : navigation avec React Router, état partagé via Context API et tests unitaires Jest.",
+     k:['React','TypeScript','React Router','Context API','Jest']},
+    {id:'dl',t:'Gestionnaire de téléchargements',s:'Application de bureau en C#.',c:'dev',cl:'Développement',
+     d:"Application Windows pour gérer des téléchargements, avec choix de l'emplacement d'enregistrement par l'utilisateur.",
+     k:['C#','.NET','Windows']},
+    {id:'ply',t:'Visualisation 3D de fichiers PLY',s:'Lecture et affichage de modèles 3D.',c:'dev',cl:'Développement',
+     d:"Parsing du format PLY pour extraire la géométrie d'un modèle et l'afficher en 3D.",
+     k:['PLY','3D','Parsing']}
+  ];
+  var list=document.getElementById('plist');
+  projects.forEach(function(p){
+    var li=document.createElement('li');li.className='proj';li.dataset.c=p.c;
+    li.innerHTML='<button class="row" type="button" aria-expanded="false" aria-controls="m-'+p.id+'">'+
+      '<h3>'+p.t+'</h3><span class="sum">'+p.s+'</span><span class="cat">'+p.cl+'</span><span class="chev" aria-hidden="true">+</span></button>'+
+      '<div class="more" id="m-'+p.id+'" hidden><div><p>'+p.d+'</p>'+(p.st?'<p class="status">'+p.st+'</p>':'')+
+      '<ul class="chips">'+p.k.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul></div></div>';
+    var b=li.querySelector('button'), m=li.querySelector('.more');
+    b.addEventListener('click',function(){
+      var open=b.getAttribute('aria-expanded')==='true';
+      b.setAttribute('aria-expanded',String(!open)); m.hidden=open; li.classList.toggle('open',!open);
+    });
+    list.appendChild(li);
+  });
+  var fbtns=document.querySelectorAll('.filters:not(.sfilters) button');
+  fbtns.forEach(function(b){b.addEventListener('click',function(){
+    fbtns.forEach(function(x){x.setAttribute('aria-pressed','false')});
+    b.setAttribute('aria-pressed','true');
+    var f=b.dataset.f;
+    list.querySelectorAll('.proj').forEach(function(li){li.hidden=!(f==='all'||li.dataset.c===f)});
+  })});
+
+  /* Topologie animée */
+  var NS='http://www.w3.org/2000/svg', g=document.getElementById('pkts'), log=document.getElementById('log');
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function rnd(a,b,d){return (a+Math.random()*(b-a)).toFixed(d)}
+  var msgs=[
+    {r:['w1','w4','w5'],topic:'domo/salon/lux',val:function(){return rnd(120,480,0)+' lx'}},
+    {r:['w2','w6','w7'],topic:'domo/entree/pir',val:function(){return 'mouvement'}},
+    {r:['w3','w4','w5'],topic:'shellies/prise-bureau/power',val:function(){return rnd(18,65,1)+' W'}},
+    {r:['w1','w4','w5'],topic:'domo/cave/eau',val:function(){return 'sec'}},
+    {r:['w1','w4','w5'],topic:'domo/salon/son',val:function(){return rnd(32,58,0)+' dB'}}
+  ];
+  function addLog(m){
+    var t=new Date(), hh=('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2)+':'+('0'+t.getSeconds()).slice(-2);
+    var row=document.createElement('div');
+    row.innerHTML='<span>'+hh+'</span> <span class="t">'+m.topic+'</span> <span class="v">'+m.val()+'</span>';
+    log.appendChild(row); while(log.children.length>4) log.removeChild(log.firstChild);
+  }
+  if(reduce){ msgs.slice(0,4).forEach(addLog); return; }
+  function send(m){
+    var c=document.createElementNS(NS,'circle'); c.setAttribute('r','5'); c.setAttribute('class','pkt'); g.appendChild(c);
+    var i=0;
+    function leg(){
+      if(i>=m.r.length){c.remove();return;}
+      var p=document.getElementById(m.r[i]), L=p.getTotalLength(), dur=(m.r[i]==='w5'||m.r[i]==='w7')?450:900, t0=null;
+      if(i===1){c.setAttribute('class','pkt ok'); addLog(m);}
+      function step(ts){
+        if(!t0)t0=ts; var k=Math.min((ts-t0)/dur,1), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2, pt=p.getPointAtLength(e*L);
+        c.setAttribute('cx',pt.x); c.setAttribute('cy',pt.y);
+        if(k<1) requestAnimationFrame(step); else {i++; leg();}
+      }
+      requestAnimationFrame(step);
+    }
+    leg();
+  }
+  var n=0;
+  function loop(){ if(!document.hidden && current==='accueil') send(msgs[n++%msgs.length]); setTimeout(loop,1600); }
+  loop();
+})();
+</script>
+</body>
+</html>
