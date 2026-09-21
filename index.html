@@ -5,6 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Lucas Chavanne · Systèmes, IoT et self-hosting</title>
 <meta name="description" content="Portfolio de Lucas Chavanne, technicien ES en informatique : administration système, Proxmox, IoT sur Raspberry Pi et Pico 2W, pipelines de données InfluxDB et Grafana.">
+<meta name="theme-color" content="#EEF1F4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111112" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%23C51A4A'/%3E%3C/svg%3E">
+<script>
+/* Avant le premier rendu : thème enregistré, et splash une seule fois par session */
+(function(){
+  var d=document.documentElement;
+  try{var t=localStorage.getItem('theme'); if(t) d.setAttribute('data-theme',t);}catch(e){}
+  try{
+    if(!sessionStorage.getItem('splash') && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+      d.classList.add('has-splash'); sessionStorage.setItem('splash','1');
+    }
+  }catch(e){}
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -19,39 +34,55 @@
   --signal:#2F7F6F;
   --node:#FFFFFF;
   --focus:#1D5FD1;
+  --nav-h:61px;
   box-sizing:border-box;
-  padding-top:env(safe-area-inset-top,0px);
-  padding-bottom:env(safe-area-inset-bottom,0px);
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --paper:#152029;
-    --paper-2:#1C2A35;
-    --ink:#E6ECF1;
-    --ink-soft:#9DAEBD;
-    --rule:#2E3F4D;
+    --paper:#111112;
+    --paper-2:#1B1B1D;
+    --ink:#EDEDED;
+    --ink-soft:#A1A1A6;
+    --rule:#303033;
     --raspberry:#F0507A;
     --signal:#5CC2AC;
-    --node:#1F2F3B;
+    --node:#232326;
     --focus:#7FB0FF;
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --paper:#152029;
-  --paper-2:#1C2A35;
-  --ink:#E6ECF1;
-  --ink-soft:#9DAEBD;
-  --rule:#2E3F4D;
+  --paper:#111112;
+  --paper-2:#1B1B1D;
+  --ink:#EDEDED;
+  --ink-soft:#A1A1A6;
+  --rule:#303033;
   --raspberry:#F0507A;
   --signal:#5CC2AC;
-  --node:#1F2F3B;
+  --node:#232326;
   --focus:#7FB0FF;
   color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:inherit}
-html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 72px);scroll-behavior:smooth}
+html{scroll-padding-top:110px;scroll-behavior:smooth;scrollbar-gutter:stable}
+
+/* Barre de défilement : suit le thème, framboise au survol.
+   Chrome et Safari lisent les pseudo-éléments WebKit, Firefox les propriétés standard. */
+@supports selector(::-webkit-scrollbar){
+  ::-webkit-scrollbar{width:14px;height:14px}
+  ::-webkit-scrollbar-track{background:var(--paper);border-left:1px solid var(--rule)}
+  ::-webkit-scrollbar-thumb{
+    background:color-mix(in srgb,var(--ink-soft) 55%,transparent);
+    border:4px solid var(--paper);border-radius:999px;background-clip:padding-box;min-height:48px;
+  }
+  ::-webkit-scrollbar-thumb:hover,::-webkit-scrollbar-thumb:active{background:var(--raspberry);background-clip:padding-box}
+  ::-webkit-scrollbar-corner{background:var(--paper)}
+  .nav ul::-webkit-scrollbar{display:none}
+}
+@supports not selector(::-webkit-scrollbar){
+  html{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--ink-soft) 55%,var(--paper)) var(--paper)}
+}
 @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
 body{
   margin:0;background:var(--paper);color:var(--ink);
@@ -63,12 +94,16 @@ body{
 img,svg{max-width:100%}
 a{color:inherit}
 :focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:2px}
-.wrap{max-width:1160px;margin:0 auto;padding:0 clamp(1.25rem,4vw,2.5rem)}
+.wrap{
+  max-width:1160px;margin:0 auto;
+  padding-left:max(clamp(1.25rem,4vw,2.5rem),env(safe-area-inset-left,0px));
+  padding-right:max(clamp(1.25rem,4vw,2.5rem),env(safe-area-inset-right,0px));
+}
 .mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
 
 /* Nav */
 .nav{
-  position:sticky;top:env(safe-area-inset-top,0px);z-index:10;
+  position:sticky;top:0;z-index:10;padding-top:env(safe-area-inset-top,0px);
   background:color-mix(in srgb,var(--paper) 88%,transparent);
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
   border-bottom:1px solid var(--rule);
@@ -86,33 +121,46 @@ a{color:inherit}
 .nav ul a[aria-current="page"]{color:var(--ink);font-weight:600;box-shadow:inset 0 -2px 0 var(--raspberry)}
 .nav ul a{padding:.35rem 0}
 @media (max-width:720px){
-  .nav .wrap{height:auto;flex-wrap:wrap;padding-top:.6rem;padding-bottom:.2rem;row-gap:.2rem}
-  .nav ul{order:3;width:100%;overflow-x:auto;gap:1.25rem;padding-bottom:.45rem;scrollbar-width:none}
-  .nav ul a{white-space:nowrap}
+  .nav .wrap{height:auto;flex-wrap:wrap;row-gap:0;padding-top:.2rem}
+  .nav ul{order:3;width:100%;justify-content:space-between;overflow-x:auto;gap:.4rem;scrollbar-width:none}
+  .nav ul a{white-space:nowrap;font-size:.88rem}
+}
+/* Cibles tactiles de 44 px sur mobile et écrans tactiles */
+@media (max-width:720px),(pointer:coarse){
+  .brand{min-height:44px}
+  .nav ul a{display:inline-flex;align-items:center;min-height:44px;padding:0 .1rem}
+  .theme-btn{width:44px;height:44px}
+  .filters button{min-height:44px}
 }
 .page[hidden]{display:none}
 .page > section:first-child{border-top:none}
 .page-title{padding-top:clamp(2.5rem,6vw,4.5rem)}
 .page-title h2{font-size:clamp(2.6rem,6.5vw,4.6rem);font-variation-settings:"wdth" 125}
-/* Liens vers les pages depuis l'accueil */
-.goto{list-style:none;margin:0;padding:0;border-top:1.5px solid var(--ink)}
-.goto a{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr) 1.5rem;gap:1.25rem;align-items:center;padding:1.4rem .25rem;border-bottom:1px solid var(--rule);text-decoration:none}
-.goto a:hover h3{color:var(--raspberry)}
-.goto h3{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;font-variation-settings:"wdth" 120}
-.goto span{color:var(--ink-soft)}
-.goto b{font-size:1.4rem;text-align:right;font-weight:400}
-@media (max-width:640px){.goto a{grid-template-columns:1fr 1.5rem}.goto span{grid-column:1;grid-row:2}.goto b{grid-column:2;grid-row:1}}
-
+.page-title .sec-head{grid-template-columns:minmax(0,1fr);align-items:start;row-gap:1rem}
 /* Hero */
-.hero{padding:clamp(2.5rem,7vw,5.5rem) 0 clamp(2rem,5vw,4rem)}
+.hero{
+  display:flex;align-items:center;
+  min-height:calc(100vh - var(--nav-h));min-height:calc(100svh - var(--nav-h));
+  padding:clamp(1.25rem,3svh,2.5rem) 0;
+}
+.hero .wrap{width:100%}
 .hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:clamp(2rem,5vw,4rem);align-items:center}
-@media (max-width:900px){.hero-grid{grid-template-columns:1fr}}
+@media (max-width:900px){
+  /* Petit écran : le texte remplit le premier écran, le schéma vient juste dessous */
+  .hero{display:block;min-height:0;padding:0}
+  .hero-grid{grid-template-columns:minmax(0,1fr);gap:0}
+  .hero-copy{
+    min-height:calc(100vh - var(--nav-h));min-height:calc(100svh - var(--nav-h));
+    display:flex;flex-direction:column;justify-content:center;padding:2rem 0;
+  }
+  .topo{margin-bottom:clamp(2rem,5vw,4rem)}
+}
 .hero h1{
-  font-size:clamp(2.6rem,7vw,5.2rem);line-height:.95;margin:0 0 1.5rem;
+  font-size:clamp(2.3rem,min(7vw,11svh),5.2rem);line-height:.95;margin:0 0 clamp(.75rem,2.5svh,1.5rem);
   font-weight:800;font-variation-settings:"wdth" 125;letter-spacing:-.025em;
 }
 .hero h1 span{display:block;font-weight:400;font-variation-settings:"wdth" 75;letter-spacing:0;color:var(--ink-soft);font-size:.42em;line-height:1.2;margin-top:.9rem}
-.lede{font-size:clamp(1.1rem,1.6vw,1.3rem);max-width:34ch;margin:0 0 2rem;line-height:1.5}
+.lede{font-size:clamp(1.1rem,1.6vw,1.3rem);max-width:34ch;margin:0 0 clamp(1rem,3.5svh,2rem);line-height:1.5}
 .cta-row{display:flex;flex-wrap:wrap;gap:.75rem}
 .btn{
   display:inline-flex;align-items:center;gap:.5rem;padding:.8rem 1.25rem;border-radius:6px;
@@ -123,15 +171,14 @@ a{color:inherit}
 .btn-ghost:hover{background:var(--paper-2)}
 
 /* Topology */
-.topo{
-  margin:0;background:var(--paper-2);border:1px solid var(--rule);border-radius:14px;padding:1rem 1rem .75rem;
-  background-image:radial-gradient(var(--rule) 1px,transparent 1px);background-size:18px 18px;
-}
-.topo-head{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin:0 .25rem .5rem;font-size:.85rem;color:var(--ink-soft)}
+.topo{margin:0;background:var(--paper-2);border:1px solid var(--rule);border-radius:14px;padding:1rem 1rem .5rem}
+.topo-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.15rem 1rem;margin:0 .25rem .5rem;font-size:.85rem;color:var(--ink-soft)}
 .topo-head strong{color:var(--ink);font-weight:600}
-.live{display:inline-flex;align-items:center;gap:.4rem}
-.live::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--signal)}
 .topo svg{display:block;width:100%;height:auto}
+/* Disposition verticale quand la carte est étroite : le texte reste lisible */
+.topo.tall svg{max-width:360px;margin:0 auto}
+.topo.tall .n text{font-size:14.5px}
+.topo.tall .n text.sub{font-size:11px}
 .n rect{fill:var(--node);stroke:var(--ink);stroke-width:1.25}
 .n.broker rect{fill:var(--ink)}
 .n.broker text{fill:var(--paper)}
@@ -143,12 +190,13 @@ a{color:inherit}
 .pkt.ok{fill:var(--signal)}
 .log{
   margin:.6rem .25rem 0;padding:.6rem .75rem;border-top:1px solid var(--rule);
-  font-size:.78rem;line-height:1.65;min-height:6.6em;color:var(--ink-soft);overflow:hidden;
+  font-size:.78rem;line-height:1.65;min-height:5em;color:var(--ink-soft);overflow:hidden;
 }
-.log div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.log .t{color:var(--signal)}
+.log div{display:flex;gap:.6em;white-space:nowrap}
+.log .ts,.log .v{flex:none}
+.log .t{color:var(--signal);min-width:0;overflow:hidden;text-overflow:ellipsis}
 .log .v{color:var(--ink)}
-.note{font-size:.75rem;color:var(--ink-soft);margin:.35rem .25rem 0}
+@media (max-width:480px){.log .ts{display:none}}
 
 /* Sections */
 section{padding:clamp(3rem,8vw,6rem) 0;border-top:1px solid var(--rule)}
@@ -185,6 +233,7 @@ h3{margin:0;font-variation-settings:"wdth" 110;letter-spacing:-.01em;line-height
 .flow li{display:grid;grid-template-columns:7rem 1fr;gap:.75rem;padding:.55rem 0;border-bottom:1px solid color-mix(in srgb,var(--paper) 18%,transparent);font-size:.95rem}
 .flow li b{font-weight:600}
 .flow li span{opacity:.78}
+@media (max-width:480px){.flow li{grid-template-columns:1fr;gap:.1rem}}
 details.learn{border-top:1px solid color-mix(in srgb,var(--paper) 25%,transparent);padding-top:1rem}
 details.learn summary{cursor:pointer;font-weight:600}
 details.learn ul{margin:.75rem 0 0;padding-left:1.1rem;opacity:.85;font-size:.93rem}
@@ -228,43 +277,35 @@ details.learn li{margin-bottom:.45rem}
 .chips li{font-size:.82rem;padding:.2rem .6rem;border:1px solid var(--rule);border-radius:4px;background:var(--paper-2)}
 .status{font-size:.85rem;color:var(--signal);font-weight:600}
 
-/* Stack layers */
-.layers{list-style:none;margin:0;padding:0}
-.layer{
-  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2.2fr);gap:1.5rem;
-  padding:1.3rem 0;border-bottom:1px solid var(--rule);align-items:start;
+/* Stack */
+/* Barre de filtres : reste accrochée sous la nav pendant tout le défilement de la page */
+.sbar{
+  position:sticky;top:calc(var(--nav-h) - 1px);z-index:9;
+  background:color-mix(in srgb,var(--paper) 90%,transparent);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);
 }
-.layer:first-child{border-top:1.5px solid var(--ink)}
-@media (max-width:700px){.layer{grid-template-columns:1fr;gap:.6rem}}
-.layer h3{font-size:1.15rem}
-.layer .why{display:block;font-size:.88rem;color:var(--ink-soft);font-weight:400;font-variation-settings:"wdth" 100;margin-top:.25rem;letter-spacing:0}
-.layer .chips li{font-size:.92rem;padding:.3rem .75rem;background:var(--node)}
-.layer .chips li.key{border-color:var(--ink);font-weight:600}
-.stack-foot{margin-top:1rem;font-size:.9rem;color:var(--ink-soft)}
-.stack-foot b{color:var(--ink)}
-
-/* Stack en cards */
+/* Une seule ligne, défilable si les boutons ne tiennent pas : la barre reste fine */
+.sbar .filters{margin:0;padding:.6rem 0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+.sbar .filters button{flex:none;white-space:nowrap}
+@supports selector(::-webkit-scrollbar){.sbar .filters::-webkit-scrollbar{display:none}}
 .sgroup{margin-bottom:clamp(2rem,4vw,3rem)}
 .sgroup[hidden]{display:none}
-.sgroup-head{display:flex;align-items:baseline;gap:1rem;flex-wrap:wrap;padding-bottom:.75rem;margin-bottom:1rem;border-bottom:1.5px solid var(--ink)}
+.sgroup-head{padding-bottom:.75rem;margin-bottom:1rem;border-bottom:1.5px solid var(--ink)}
 .sgroup-head h3{font-size:1.4rem;font-weight:800;font-variation-settings:"wdth" 118}
-.sgroup-head span{color:var(--ink-soft);font-size:.95rem}
-.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:.85rem;list-style:none;margin:0;padding:0}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.85rem;list-style:none;margin:0;padding:0}
 .tcard{
   position:relative;background:var(--node);border:1px solid var(--rule);border-radius:10px;
-  padding:1rem 1rem 1.05rem;display:grid;grid-template-columns:44px 1fr;gap:.85rem;align-items:start;
+  padding:.9rem 1rem 1rem;display:grid;grid-template-columns:40px minmax(0,1fr);gap:.85rem;align-items:start;
 }
-.tcard .ico{
-  width:44px;height:44px;border-radius:9px;display:grid;place-items:center;
-  background:var(--paper-2);color:var(--ink);
-}
-.tcard .ico svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+/* La vignette reste claire dans les deux thèmes : les couleurs de marque y sont toujours lisibles */
+.logo{width:40px;height:40px;border-radius:9px;background:#EEF1F4;display:grid;place-items:center}
+.logo img{width:24px;height:24px;display:block}
 .tcard.key{border-color:var(--ink)}
-.tcard.key .ico{background:var(--raspberry);color:#fff}
 .tcard.key::after{content:"";position:absolute;top:.8rem;right:.8rem;width:7px;height:7px;border-radius:50%;background:var(--raspberry)}
 .tcard b{display:block;font-weight:700;font-variation-settings:"wdth" 108;line-height:1.25;padding-right:.8rem}
 .tcard small{display:block;color:var(--ink-soft);font-size:.87rem;line-height:1.4;margin-top:.2rem}
-.legend{display:flex;align-items:center;gap:.5rem;font-size:.88rem;color:var(--ink-soft);margin:-0.5rem 0 1.75rem}
+.legend{display:flex;align-items:center;gap:.5rem;font-size:.88rem;color:var(--ink-soft);margin:1.5rem 0 1.5rem}
 .legend i{width:7px;height:7px;border-radius:50%;background:var(--raspberry);display:inline-block}
 
 /* Timeline */
@@ -287,11 +328,47 @@ details.learn li{margin-bottom:.45rem}
 .contact .btn-primary{background:var(--paper);color:var(--ink)}
 .contact .btn-primary:hover{background:var(--raspberry);border-color:var(--raspberry);color:#fff}
 .contact .btn-ghost:hover{background:color-mix(in srgb,var(--paper) 12%,transparent)}
-footer{background:var(--ink);color:color-mix(in srgb,var(--paper) 60%,transparent);font-size:.85rem;padding:1.5rem 0 2rem;border-top:1px solid color-mix(in srgb,var(--paper) 15%,transparent)}
+footer{background:var(--ink);color:color-mix(in srgb,var(--paper) 60%,transparent);font-size:.85rem;padding:1.5rem 0 calc(2rem + env(safe-area-inset-bottom,0px));border-top:1px solid color-mix(in srgb,var(--paper) 15%,transparent)}
+
+/* Splash : le trajet d'un message MQTT, comme sur l'accueil.
+   Entièrement piloté par CSS, donc il se ferme seul même si le script échoue. */
+#splash{display:none}
+.has-splash #splash{
+  position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:var(--paper);
+  animation:sp-out .4s ease 1.5s forwards;
+}
+#splash.skip{animation:sp-skip .2s ease forwards}
+.sp-inner{width:min(340px,calc(100vw - 3rem))}
+.sp-brand{
+  display:flex;align-items:center;gap:.6rem;font-weight:800;font-variation-settings:"wdth" 125;
+  font-size:clamp(1.6rem,7vw,2.4rem);letter-spacing:-.02em;line-height:1;
+  opacity:0;animation:sp-in .35s ease .05s forwards;
+}
+.sp-brand .brand-dot{width:.5em;height:.5em;flex:none}
+.sp-wire{position:relative;height:0;margin:1.75rem 0 1.1rem;border-top:1.25px dashed var(--ink-soft);opacity:0;animation:sp-in .3s ease .15s forwards}
+.sp-pkt{
+  position:absolute;top:-5.5px;left:0;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:var(--raspberry);
+  animation:sp-run .7s cubic-bezier(.45,0,.2,1) .35s forwards,sp-ok .01s linear .7s forwards;
+}
+.sp-log{display:flex;gap:.6em;font-size:.8rem;color:var(--ink-soft);opacity:0;animation:sp-in .3s ease 1.05s forwards}
+.sp-log .t{color:var(--signal)}
+@keyframes sp-in{to{opacity:1}}
+@keyframes sp-run{to{left:100%}}
+@keyframes sp-ok{to{background:var(--signal)}}
+@keyframes sp-out{to{opacity:0;visibility:hidden}}
+@keyframes sp-skip{to{opacity:0;visibility:hidden}}
 footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
 </style>
 </head>
 <body>
+
+<div id="splash" aria-hidden="true">
+  <div class="sp-inner">
+    <div class="sp-brand"><span class="brand-dot"></span>Lucas Chavanne</div>
+    <div class="sp-wire"><i class="sp-pkt"></i></div>
+    <div class="sp-log mono"><span class="t">portfolio/accueil</span><span>connecté</span></div>
+  </div>
+</div>
 
 <nav class="nav" aria-label="Navigation principale">
   <div class="wrap">
@@ -311,7 +388,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
 <div class="page" data-page="accueil" data-title="Lucas Chavanne · Systèmes, IoT et self-hosting">
   <header class="hero">
     <div class="wrap hero-grid">
-      <div>
+      <div class="hero-copy">
         <h1>Lucas Chavanne<span>Technicien ES en informatique, Genève</span></h1>
         <p class="lede">Je construis des systèmes qui tournent chez moi, sans cloud : du capteur branché sur une Pico jusqu'au dashboard Grafana, en passant par le serveur Proxmox qui héberge tout.</p>
         <div class="cta-row">
@@ -321,31 +398,9 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
       </div>
 
       <figure class="topo" aria-labelledby="topoCap">
-        <div class="topo-head">
-          <span id="topoCap"><strong>Domo</strong>, le flux de données de mon TPI</span>
-          <span class="live">en direct</span>
-        </div>
-        <svg viewBox="0 0 600 420" role="img" aria-label="Architecture Domo : la Pico 2W, la Pi Zero 2W et les prises Shelly publient sur le broker Mosquitto du Raspberry Pi 5, qui alimente Telegraf, InfluxDB et Grafana, ainsi que l'API Flask qui envoie les alertes via ntfy.">
-          <path id="w1" class="wire" d="M150 80 C 190 80, 190 200, 225 205"/>
-          <path id="w2" class="wire" d="M150 210 L 225 210"/>
-          <path id="w3" class="wire" d="M150 340 C 190 340, 190 220, 225 215"/>
-          <path id="w4" class="wire" d="M375 205 C 405 205, 405 70, 435 70"/>
-          <path id="w5" class="wire" d="M500 93 L 500 147"/>
-          <path id="w6" class="wire" d="M375 215 C 405 215, 405 270, 435 270"/>
-          <path id="w7" class="wire" d="M500 293 L 500 337"/>
-
-          <g class="n"><rect x="20" y="57" width="130" height="46" rx="6"/><text x="85" y="77">Pico 2W</text><text class="sub" x="85" y="92">capteurs</text></g>
-          <g class="n"><rect x="20" y="187" width="130" height="46" rx="6"/><text x="85" y="207">Pi Zero 2W</text><text class="sub" x="85" y="222">PIR + caméra</text></g>
-          <g class="n"><rect x="20" y="317" width="130" height="46" rx="6"/><text x="85" y="337">Shelly</text><text class="sub" x="85" y="352">prises connectées</text></g>
-          <g class="n broker"><rect x="225" y="182" width="150" height="56" rx="8"/><text x="300" y="206">Mosquitto</text><text class="sub" x="300" y="223">Raspberry Pi 5</text></g>
-          <g class="n"><rect x="435" y="47" width="130" height="46" rx="6"/><text x="500" y="67">Telegraf</text><text class="sub" x="500" y="82">collecte</text></g>
-          <g class="n"><rect x="435" y="147" width="130" height="46" rx="6"/><text x="500" y="167">InfluxDB</text><text class="sub" x="500" y="182">+ Grafana</text></g>
-          <g class="n"><rect x="435" y="247" width="130" height="46" rx="6"/><text x="500" y="267">API Flask</text><text class="sub" x="500" y="282">logique, OTA</text></g>
-          <g class="n"><rect x="435" y="337" width="130" height="46" rx="6"/><text x="500" y="357">ntfy</text><text class="sub" x="500" y="372">notifications</text></g>
-          <g id="pkts"></g>
-        </svg>
-        <div class="log mono" id="log"></div>
-        <figcaption class="note">Messages MQTT simulés, sur le modèle des topics du projet.</figcaption>
+        <div class="topo-head"><span id="topoCap"><strong>Domo</strong>, le flux de données de mon TPI</span><span>simulation</span></div>
+        <svg id="topoSvg" viewBox="0 0 600 420" role="img" aria-label="Architecture Domo : la Pico 2W, la Pi Zero 2W et les prises Shelly publient sur le broker Mosquitto du Raspberry Pi 5, qui alimente Telegraf, InfluxDB et Grafana, ainsi que l'API Flask qui envoie les alertes via ntfy."></svg>
+        <div class="log mono" id="log" aria-hidden="true"></div>
       </figure>
     </div>
   </header>
@@ -354,35 +409,20 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
     <div class="wrap">
       <div class="sec-head">
         <h2>À propos</h2>
-        <p>Administrateur système par formation, bricoleur d'électronique par goût.</p>
       </div>
       <div class="about-grid">
         <div>
           <p>Je viens de terminer mon diplôme de technicien ES en informatique au CFPT Genève et je commence la HEG Genève en septembre 2026. Ce qui m'intéresse, c'est l'ensemble de la chaîne : choisir le matériel, écrire le firmware, faire circuler les données proprement et les rendre lisibles.</p>
-          <p>La plupart de mes projets tournent sur mon propre serveur Proxmox. J'y héberge mon GitLab avec ses pipelines CI/CD, mes services multimédia et ma domotique. Quand quelque chose casse, c'est à moi de le réparer, et c'est justement là que j'apprends le plus.</p>
-          <p>Mon travail de diplôme, Domo, résume bien cette approche : un système domotique complet, entièrement local et open source, que j'ai conçu du câblage des capteurs jusqu'au déploiement automatisé.</p>
+          <p>La plupart de mes projets tournent sur mon propre serveur Proxmox. J'y héberge mon GitLab avec ses pipelines CI/CD, mes services multimédia et ma domotique.</p>
+          <p>Mon travail de diplôme, Domo, est un système domotique complet, entièrement local et open source, conçu du câblage des capteurs jusqu'au déploiement automatisé.</p>
         </div>
         <dl class="facts">
           <div><dt>Diplôme</dt><dd>Technicien ES en informatique, CFPT Genève</dd></div>
           <div><dt>Dès septembre 2026</dt><dd>Étudiant à la HEG Genève</dd></div>
           <div><dt>Région</dt><dd>Genève, frontière franco-suisse</dd></div>
-          <div><dt>Terrain de jeu</dt><dd>Serveurs Linux, virtualisation, IoT, données temporelles</dd></div>
+          <div><dt>Domaines</dt><dd>Serveurs Linux, virtualisation, IoT, données temporelles</dd></div>
         </dl>
       </div>
-    </div>
-  </section>
-
-  <section>
-    <div class="wrap">
-      <div class="sec-head">
-        <h2>Explorer</h2>
-        <p>Le site est découpé en pages pour aller droit à ce qui t'intéresse.</p>
-      </div>
-      <ul class="goto">
-        <li><a href="#/projets"><h3>Projets</h3><span>Neuf projets, dont mon travail de diplôme Domo, filtrables par domaine.</span><b aria-hidden="true">›</b></a></li>
-        <li><a href="#/stack"><h3>Stack technique</h3><span>Les outils que j'utilise, rangés du matériel jusqu'au déploiement.</span><b aria-hidden="true">›</b></a></li>
-        <li><a href="#/parcours"><h3>Parcours</h3><span>Du CFPT Genève à la HEG, en passant par mon stage.</span><b aria-hidden="true">›</b></a></li>
-      </ul>
     </div>
   </section>
 </div>
@@ -392,7 +432,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
     <div class="wrap">
       <div class="sec-head">
         <h2>Projets</h2>
-        <p>Des projets d'école, de diplôme et perso. Clique sur une ligne pour voir les détails.</p>
+        <p>Projets d'école, de diplôme et personnels. Clique sur une ligne pour le détail.</p>
       </div>
 
       <article class="feature" aria-labelledby="domoTitle">
@@ -450,11 +490,17 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
     <div class="wrap">
       <div class="sec-head">
         <h2>Stack technique</h2>
-        <p>Les outils que j'utilise, avec ce que j'en fais concrètement. Ceux marqués d'une pastille sont mes outils du quotidien.</p>
+        <p>Les outils que j'utilise, avec ce que j'en fais concrètement.</p>
       </div>
-      <div class="sfilters filters" role="group" aria-label="Filtrer la stack">
-        <button type="button" data-g="all" aria-pressed="true">Tout</button>
+    </div>
+    <div class="sbar">
+      <div class="wrap">
+        <div class="sfilters filters" role="group" aria-label="Filtrer la stack">
+          <button type="button" data-g="all" aria-pressed="true">Tout</button>
+        </div>
       </div>
+    </div>
+    <div class="wrap">
       <div id="stackGrid"></div>
     </div>
   </section>
@@ -466,7 +512,6 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
     <div class="wrap">
       <div class="sec-head">
         <h2>Parcours</h2>
-        <p>Les étapes qui m'ont mené jusqu'ici.</p>
       </div>
       <ol class="timeline">
         <li>
@@ -497,7 +542,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
 
   <section id="contact" class="contact">
     <div class="wrap">
-      <h2>On en parle ?</h2>
+      <h2>Contact</h2>
       <p>Je suis ouvert aux stages, jobs étudiants et projets en administration système, IoT ou DevOps dans la région genevoise.</p>
       <div class="contact-links">
         <a class="btn btn-primary" href="mailto:lucas.chavanne.info@gmail.com">Écrire un e-mail</a>
@@ -510,7 +555,6 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
 <footer>
   <div class="wrap">
     <span>Lucas Chavanne, 2026</span>
-    <span>Site écrit à la main, sans framework.</span>
   </div>
 </footer>
 
@@ -518,7 +562,6 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
 (function(){
   /* Thème */
   var root=document.documentElement, btn=document.getElementById('themeBtn');
-  try{var saved=localStorage.getItem('theme'); if(saved) root.setAttribute('data-theme',saved);}catch(e){}
   btn.addEventListener('click',function(){
     var cur=root.getAttribute('data-theme');
     if(!cur){cur=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
@@ -547,96 +590,62 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
   window.addEventListener('hashchange',route); route();
 
   /* Stack */
-  var I={
-    chip:'<rect x="6" y="6" width="12" height="12" rx="1.5"/><rect x="9.5" y="9.5" width="5" height="5"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/>',
-    board:'<rect x="2.5" y="5" width="19" height="14" rx="2"/><rect x="6" y="8.5" width="5" height="5"/><path d="M14 9h4M14 12h4M14 15h2"/>',
-    server:'<rect x="3" y="3.5" width="18" height="7" rx="1.5"/><rect x="3" y="13.5" width="18" height="7" rx="1.5"/><path d="M7 7h.01M7 17h.01M11 7h6M11 17h6"/>',
-    layers:'<path d="M12 3 3 7.5 12 12l9-4.5L12 3z"/><path d="M3 12l9 4.5 9-4.5M3 16.5 12 21l9-4.5"/>',
-    term:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3M12.5 15H17"/>',
-    monitor:'<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/>',
-    box:'<path d="M21 8 12 3 3 8v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5M12 13v8"/>',
-    db:'<ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',
-    folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/><path d="M9 13.5h6"/>',
-    net:'<circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5v4M12 11.5 5.5 16.8M12 11.5l6.5 5.3"/>',
-    key:'<circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3M14.5 8.5l2 2"/>',
-    wall:'<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 9.3h18M3 14.7h18M9 4v5.3M15 9.3v5.4M9 14.7V20"/>',
-    ban:'<circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/>',
-    flask:'<path d="M9 3h6M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3"/><path d="M7.5 15h9"/>',
-    code:'<path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/>',
-    blocks:'<rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><path d="M17.25 13.5v7.5M13.5 17.25H21"/>',
-    type:'<path d="M4 7V5h16v2M12 5v14M9 19h6"/>',
-    check:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="m7.5 12 3 3 6-6"/>',
-    funnel:'<path d="M3 4h18l-7 8.5V19l-4 2v-8.5L3 4z"/>',
-    chart:'<path d="M3 3v18h18"/><path d="m7 15 4-5 3 3 5-7"/>',
-    radio:'<circle cx="12" cy="12" r="2"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2"/>',
-    hub:'<circle cx="12" cy="12" r="3"/><circle cx="4" cy="5" r="1.8"/><circle cx="20" cy="5" r="1.8"/><circle cx="4" cy="19" r="1.8"/><circle cx="20" cy="19" r="1.8"/><path d="m5.5 6.2 4.2 3.9M18.5 6.2l-4.2 3.9M5.5 17.8l4.2-3.9M18.5 17.8l-4.2-3.9"/>',
-    mesh:'<circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="19" r="2"/><path d="M7 6h10M6 8l5 9M18 8l-5 9"/>',
-    bell:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l2 2H4l2-2z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
-    branch:'<circle cx="6" cy="5" r="2.2"/><circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="8" r="2.2"/><path d="M6 7.2v9.6M18 10.2c0 4-6 3-11 7"/>',
-    loop:'<path d="M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5"/>',
-    ota:'<path d="M12 3v10M8 9l4 4 4-4"/><rect x="5" y="16" width="14" height="5" rx="1"/>',
-    eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
-    cam:'<path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/>',
-    plug:'<path d="M9 3v5M15 3v5M6 8h12v3a6 6 0 0 1-12 0V8zM12 17v4"/>',
-    house:'<path d="M3 11 12 4l9 7M5 9.5V20h14V9.5"/><path d="M10 20v-5h4v5"/>',
-    play:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="m10 9 5 3-5 3V9z"/>'
-  };
   var groups=[
-    {id:'infra',t:'Infrastructure',w:'Là où tout tourne',items:[
-      ['Proxmox VE','layers','Hyperviseur de mon serveur maison',1],
-      ['Debian / Linux','term','Serveurs, installation bare-metal',1],
-      ['Windows Server','monitor','Administration pendant la formation'],
-      ['LXC','box','Plex et Samba en conteneurs'],
-      ['LVM et RAID','db','Stockage du serveur, contrôleur MegaRAID'],
-      ['Samba','folder','Partage de fichiers à la maison'],
-      ['Réseau et bridges','net','Plusieurs bridges sur Proxmox']]},
-    {id:'secu',t:'Sécurité',w:'Durcir ce qui est exposé',items:[
-      ['SSH','key','Accès par clés, configuration durcie',1],
-      ['UFW','wall','Pare-feu des serveurs Debian'],
-      ['Fail2Ban','ban','Blocage des tentatives de connexion']]},
-    {id:'devops',t:'Livraison',w:'Versionner, tester, déployer',items:[
-      ['GitLab self-hosted','branch','Mon instance, hébergée sur Proxmox',1],
-      ['GitLab CI/CD','loop','Tests et déploiement de Domo',1],
-      ['Mises à jour OTA','ota','Firmware des Pico mis à jour à distance']]},
-    {id:'data',t:'Données',w:'Stocker et visualiser des séries temporelles',items:[
-      ['InfluxDB','db','Mesures des capteurs de Domo',1],
-      ['Telegraf','funnel','Collecte des messages MQTT',1],
-      ['Grafana','chart','Dashboards en temps réel',1]]},
-    {id:'iot',t:'IoT et transport',w:'Du capteur au broker',items:[
-      ['MQTT','radio','Protocole de tous mes projets connectés',1],
-      ['Mosquitto','hub','Broker sur le Raspberry Pi 5'],
-      ['Zigbee2MQTT','mesh','Volets motorisés de la maison'],
-      ['ntfy','bell','Alertes sur le téléphone'],
-      ['MicroPython','chip','Firmware des Pico 2W',1],
-      ['OpenCV','eye','Vision sur Raspberry Pi']]},
-    {id:'dev',t:'Développement',w:'Logique et interfaces',items:[
-      ['Flask','flask','API de Domo et de Portkey Coffer',1],
-      ['Python','code','Scripts, API et automatisation',1],
-      ['PHP','code','Développement web'],
-      ['C#','code','Application de bureau Windows'],
-      ['React','blocks','Pokédex avec React Router'],
-      ['TypeScript','type','Typage du Pokédex'],
-      ['Jest','check','Tests unitaires']]},
-    {id:'hw',t:'Matériel',w:'Les machines physiques',items:[
-      ['Raspberry Pi 5','board','Cœur de Domo',1],
-      ['Pico 2W','chip','Capteurs lumière, son et eau',1],
-      ['Pi Zero 2W','board','Détecteur PIR et caméra'],
-      ['ESP32','chip','Projets domotiques'],
-      ['Camera Module 3','cam','Capture à la détection de mouvement'],
-      ['Shelly','plug','Prises pilotées et mesurées'],
-      ['Hitachi CR210H','server','Mon serveur Proxmox']]},
-    {id:'home',t:'Services maison',w:'Ce qui tourne chez moi',items:[
-      ['Home Assistant','house','Domotique de la maison'],
-      ['Plex','play','Serveur multimédia'],
-      ['Nextcloud','folder','Fichiers auto-hébergés']]}
+    {id:'infra',t:'Infrastructure',items:[
+      ['Proxmox VE','Hyperviseur de mon serveur maison',1,'proxmox'],
+      ['Debian / Linux','Serveurs, installation bare-metal',1,'debian'],
+      ['Windows Server','Administration pendant la formation',0,'windows'],
+      ['LXC','Plex et Samba en conteneurs',0,'linuxcontainers'],
+      ['LVM et RAID','Stockage du serveur, contrôleur MegaRAID',0,'storage'],
+      ['Samba','Partage de fichiers à la maison',0,'samba'],
+      ['Réseau et bridges','Plusieurs bridges sur Proxmox',0,'net']]},
+    {id:'secu',t:'Sécurité',items:[
+      ['SSH','Accès par clés, configuration durcie',1,'ssh'],
+      ['UFW','Pare-feu des serveurs Debian',0,'firewall'],
+      ['Fail2Ban','Blocage des tentatives de connexion',0,'shield']]},
+    {id:'devops',t:'Livraison',items:[
+      ['GitLab self-hosted','Mon instance, hébergée sur Proxmox',1,'gitlab'],
+      ['GitLab CI/CD','Tests et déploiement de Domo',1,'gitlab'],
+      ['Mises à jour OTA','Firmware des Pico mis à jour à distance',0,'update']]},
+    {id:'data',t:'Données',items:[
+      ['InfluxDB','Mesures des capteurs de Domo',1,'influxdb'],
+      ['Telegraf','Collecte des messages MQTT',1,'telegraf'],
+      ['Grafana','Dashboards en temps réel',1,'grafana']]},
+    {id:'iot',t:'IoT et transport',items:[
+      ['MQTT','Protocole de tous mes projets connectés',1,'mqtt'],
+      ['Mosquitto','Broker sur le Raspberry Pi 5',0,'eclipsemosquitto'],
+      ['Zigbee2MQTT','Volets motorisés de la maison',0,'zigbee2mqtt'],
+      ['ntfy','Alertes sur le téléphone',0,'ntfy'],
+      ['MicroPython','Firmware des Pico 2W',1,'micropython'],
+      ['OpenCV','Vision sur Raspberry Pi',0,'opencv']]},
+    {id:'dev',t:'Développement',items:[
+      ['Flask','API de Domo et de Portkey Coffer',1,'flask'],
+      ['Python','Scripts, API et automatisation',1,'python'],
+      ['PHP','Développement web',0,'php'],
+      ['C#','Application de bureau Windows',0,'csharp'],
+      ['React','Pokédex avec React Router',0,'react'],
+      ['TypeScript','Typage du Pokédex',0,'typescript'],
+      ['Jest','Tests unitaires',0,'jest']]},
+    {id:'hw',t:'Matériel',items:[
+      ['Raspberry Pi 5','Cœur de Domo',1,'raspberrypi'],
+      ['Pico 2W','Capteurs lumière, son et eau',1,'raspberrypi'],
+      ['Pi Zero 2W','Détecteur PIR et caméra',0,'raspberrypi'],
+      ['ESP32','Projets domotiques',0,'espressif'],
+      ['Camera Module 3','Capture à la détection de mouvement',0,'raspberrypi'],
+      ['Shelly','Prises pilotées et mesurées',0,'shelly'],
+      ['Hitachi CR210H','Mon serveur Proxmox',0,'hitachi']]},
+    {id:'home',t:'Services maison',items:[
+      ['Home Assistant','Domotique de la maison',0,'homeassistant'],
+      ['Plex','Serveur multimédia',0,'plex'],
+      ['Nextcloud','Fichiers auto-hébergés',0,'nextcloud']]}
   ];
   var sg=document.getElementById('stackGrid'), sf=document.querySelector('.sfilters');
   sg.insertAdjacentHTML('beforebegin','<p class="legend"><i aria-hidden="true"></i>Outil du quotidien</p>');
   groups.forEach(function(gr){
     var b=document.createElement('button');b.type='button';b.dataset.g=gr.id;b.setAttribute('aria-pressed','false');b.textContent=gr.t;sf.appendChild(b);
-    var html='<div class="sgroup" data-g="'+gr.id+'"><div class="sgroup-head"><h3>'+gr.t+'</h3><span>'+gr.w+'</span></div><ul class="sgrid">';
+    var html='<div class="sgroup" data-g="'+gr.id+'"><div class="sgroup-head"><h3>'+gr.t+'</h3></div><ul class="sgrid">';
     gr.items.forEach(function(it){
-      html+='<li class="tcard'+(it[3]?' key':'')+'"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24">'+I[it[1]]+'</svg></span><span><b>'+it[0]+'</b><small>'+it[2]+'</small></span></li>';
+      html+='<li class="tcard'+(it[2]?' key':'')+'"><span class="logo"><img src="assets/logos/'+it[3]+'.svg" alt="" width="24" height="24" loading="lazy"></span><span><b>'+it[0]+'</b><small>'+it[1]+'</small></span></li>';
     });
     sg.insertAdjacentHTML('beforeend',html+'</ul></div>');
   });
@@ -644,6 +653,12 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
   sbtns.forEach(function(b){b.addEventListener('click',function(){
     sbtns.forEach(function(x){x.setAttribute('aria-pressed','false')});b.setAttribute('aria-pressed','true');
     sg.querySelectorAll('.sgroup').forEach(function(d){d.hidden=!(b.dataset.g==='all'||d.dataset.g===b.dataset.g)});
+    b.scrollIntoView({block:'nearest',inline:'center'});
+    /* Si la barre est collée en haut, on remonte au début de la liste pour ne pas laisser l'utilisateur en bas d'une page raccourcie */
+    var bar=document.querySelector('.sbar'), navH=document.querySelector('.nav').offsetHeight;
+    if(bar.getBoundingClientRect().top<=navH+1){
+      window.scrollTo({top:Math.max(0,window.scrollY+sg.getBoundingClientRect().top-navH-bar.offsetHeight-16)});
+    }
   })});
 
   /* Projets */
@@ -698,9 +713,58 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
     list.querySelectorAll('.proj').forEach(function(li){li.hidden=!(f==='all'||li.dataset.c===f)});
   })});
 
-  /* Topologie animée */
-  var NS='http://www.w3.org/2000/svg', g=document.getElementById('pkts'), log=document.getElementById('log');
+  /* Topologie animée. Deux dispositions : large, et verticale quand la carte est étroite. */
+  var NS='http://www.w3.org/2000/svg', svg=document.getElementById('topoSvg'), log=document.getElementById('log'), fig=svg.parentNode;
   var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var nodes=[
+    {id:'pico',t:'Pico 2W',s:'capteurs'},
+    {id:'zero',t:'Pi Zero 2W',s:'PIR + caméra'},
+    {id:'shelly',t:'Shelly',s:'prises connectées'},
+    {id:'mqtt',t:'Mosquitto',s:'Raspberry Pi 5',broker:1},
+    {id:'telegraf',t:'Telegraf',s:'collecte'},
+    {id:'influx',t:'InfluxDB',s:'+ Grafana'},
+    {id:'flask',t:'API Flask',s:'logique, OTA'},
+    {id:'ntfy',t:'ntfy',s:'notifications'}
+  ];
+  var layouts={
+    wide:{vb:'0 0 600 420',
+      pos:{pico:[20,57,130,46],zero:[20,187,130,46],shelly:[20,317,130,46],mqtt:[225,182,150,56],telegraf:[435,47,130,46],influx:[435,147,130,46],flask:[435,247,130,46],ntfy:[435,337,130,46]},
+      wires:{w1:'M150 80 C 190 80, 190 200, 225 205',w2:'M150 210 L 225 210',w3:'M150 340 C 190 340, 190 220, 225 215',w4:'M375 205 C 405 205, 405 70, 435 70',w5:'M500 93 L 500 147',w6:'M375 215 C 405 215, 405 270, 435 270',w7:'M500 293 L 500 337'}},
+    tall:{vb:'0 0 320 412',
+      pos:{pico:[2,10,100,46],zero:[110,10,100,46],shelly:[218,10,100,46],mqtt:[60,130,200,56],telegraf:[2,250,152,46],influx:[2,356,152,46],flask:[166,250,152,46],ntfy:[166,356,152,46]},
+      wires:{w1:'M52 56 C 52 95, 110 95, 110 130',w2:'M160 56 L 160 130',w3:'M268 56 C 268 95, 210 95, 210 130',w4:'M110 186 C 110 220, 78 220, 78 250',w5:'M78 296 L 78 356',w6:'M210 186 C 210 220, 242 220, 242 250',w7:'M242 296 L 242 356'}}
+  };
+  var mode='';
+  var nav=document.querySelector('.nav'), hero=document.querySelector('.hero');
+  function measureNav(){root.style.setProperty('--nav-h',nav.offsetHeight+'px');}
+  function draw(){
+    if(!fig.clientWidth) return; /* page masquée : on redessine quand elle s'affiche */
+    /* Espace disponible pour le schéma : sur grand écran il doit tenir dans le premier écran */
+    var cs=getComputedStyle(fig), w=fig.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight), h=Infinity;
+    if(innerWidth>900){
+      var hs=getComputedStyle(hero), chrome=fig.offsetHeight-svg.getBoundingClientRect().height;
+      h=Math.max(220,innerHeight-nav.offsetHeight-parseFloat(hs.paddingTop)-parseFloat(hs.paddingBottom)-chrome);
+    }
+    svg.style.maxHeight=h===Infinity?'':Math.floor(h)+'px';
+    /* On garde la disposition large sauf si la verticale donne un texte nettement plus grand */
+    var sw=Math.min(w/600,h/420), st=Math.min(Math.min(w,360)/320,h/412);
+    var m=14.5*st>13*sw*1.25?'tall':'wide';
+    if(m===mode) return; mode=m;
+    var L=layouts[m], h='';
+    fig.classList.toggle('tall',m==='tall');
+    svg.setAttribute('viewBox',L.vb);
+    Object.keys(L.wires).forEach(function(k){h+='<path id="'+k+'" class="wire" d="'+L.wires[k]+'"/>';});
+    nodes.forEach(function(n){
+      var p=L.pos[n.id], cx=p[0]+p[2]/2, ty=p[1]+(n.broker?24:20), sy=p[1]+(n.broker?41:35);
+      h+='<g class="n'+(n.broker?' broker':'')+'"><rect x="'+p[0]+'" y="'+p[1]+'" width="'+p[2]+'" height="'+p[3]+'" rx="'+(n.broker?8:6)+'"/>'+
+         '<text x="'+cx+'" y="'+ty+'">'+n.t+'</text><text class="sub" x="'+cx+'" y="'+sy+'">'+n.s+'</text></g>';
+    });
+    svg.innerHTML=h+'<g id="pkts"></g>';
+  }
+  measureNav(); draw();
+  if('ResizeObserver' in window) new ResizeObserver(draw).observe(fig);
+  window.addEventListener('resize',function(){measureNav(); draw();});
+
   function rnd(a,b,d){return (a+Math.random()*(b-a)).toFixed(d)}
   var msgs=[
     {r:['w1','w4','w5'],topic:'domo/salon/lux',val:function(){return rnd(120,480,0)+' lx'}},
@@ -712,29 +776,44 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
   function addLog(m){
     var t=new Date(), hh=('0'+t.getHours()).slice(-2)+':'+('0'+t.getMinutes()).slice(-2)+':'+('0'+t.getSeconds()).slice(-2);
     var row=document.createElement('div');
-    row.innerHTML='<span>'+hh+'</span> <span class="t">'+m.topic+'</span> <span class="v">'+m.val()+'</span>';
-    log.appendChild(row); while(log.children.length>4) log.removeChild(log.firstChild);
+    row.innerHTML='<span class="ts">'+hh+'</span><span class="t">'+m.topic+'</span><span class="v">'+m.val()+'</span>';
+    log.appendChild(row); while(log.children.length>3) log.removeChild(log.firstChild);
   }
-  if(reduce){ msgs.slice(0,4).forEach(addLog); return; }
-  function send(m){
-    var c=document.createElementNS(NS,'circle'); c.setAttribute('r','5'); c.setAttribute('class','pkt'); g.appendChild(c);
-    var i=0;
-    function leg(){
-      if(i>=m.r.length){c.remove();return;}
-      var p=document.getElementById(m.r[i]), L=p.getTotalLength(), dur=(m.r[i]==='w5'||m.r[i]==='w7')?450:900, t0=null;
-      if(i===1){c.setAttribute('class','pkt ok'); addLog(m);}
-      function step(ts){
-        if(!t0)t0=ts; var k=Math.min((ts-t0)/dur,1), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2, pt=p.getPointAtLength(e*L);
-        c.setAttribute('cx',pt.x); c.setAttribute('cy',pt.y);
-        if(k<1) requestAnimationFrame(step); else {i++; leg();}
+  if(!reduce){
+    var send=function(m){
+      var g=document.getElementById('pkts'); if(!g) return;
+      var c=document.createElementNS(NS,'circle'); c.setAttribute('r','5'); c.setAttribute('class','pkt');
+      g.appendChild(c);
+      var i=0;
+      function leg(){
+        if(i>=m.r.length){c.remove();return;}
+        var p=document.getElementById(m.r[i]), L=p.getTotalLength(), dur=Math.max(350,L*6), t0=null;
+        if(i===1){c.setAttribute('class','pkt ok'); addLog(m);}
+        function step(ts){
+          if(!t0)t0=ts; var k=Math.min((ts-t0)/dur,1), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2, pt=p.getPointAtLength(e*L);
+          c.setAttribute('cx',pt.x); c.setAttribute('cy',pt.y);
+          if(k<1) requestAnimationFrame(step); else {i++; leg();}
+        }
+        requestAnimationFrame(step);
       }
-      requestAnimationFrame(step);
-    }
-    leg();
+      leg();
+    };
+    var n=0;
+    (function loop(){ if(!document.hidden && current==='accueil') send(msgs[n++%msgs.length]); setTimeout(loop,1600); })();
+  } else {
+    msgs.slice(0,3).forEach(addLog);
   }
-  var n=0;
-  function loop(){ if(!document.hidden && current==='accueil') send(msgs[n++%msgs.length]); setTimeout(loop,1600); }
-  loop();
+
+  /* Splash : fermeture au clic ou à la touche. Sinon il se ferme seul (animation CSS). */
+  var sp=document.getElementById('splash'), htm=document.documentElement;
+  if(sp && htm.classList.contains('has-splash')){
+    var skip=function(){sp.classList.add('skip');};
+    window.addEventListener('pointerdown',skip,{once:true});
+    window.addEventListener('keydown',skip,{once:true});
+    sp.addEventListener('animationend',function(e){
+      if(e.animationName==='sp-out'||e.animationName==='sp-skip'){sp.remove(); htm.classList.remove('has-splash');}
+    });
+  }
 })();
 </script>
 </body>
