@@ -246,36 +246,8 @@ details.learn li{margin-bottom:.45rem}
   border:1.5px solid var(--rule);background:transparent;color:var(--ink);
 }
 .filters button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-.plist{list-style:none;margin:0;padding:0;border-top:1.5px solid var(--ink)}
-.proj{border-bottom:1px solid var(--rule)}
-.proj[hidden]{display:none}
-.proj button.row{
-  all:unset;box-sizing:border-box;cursor:pointer;width:100%;
-  display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1.8fr) 7.5rem 1.5rem;gap:1.25rem;align-items:center;
-  padding:1.2rem .25rem;
-}
-.proj button.row:focus-visible{outline:3px solid var(--focus);outline-offset:-3px}
-.proj button.row:hover h3{color:var(--raspberry)}
-.proj h3{font-size:1.3rem}
-.proj .sum{color:var(--ink-soft);font-size:.97rem}
-.proj .cat{font-size:.85rem;color:var(--ink-soft)}
-.proj .chev{font-size:1.3rem;transition:transform .2s ease;text-align:right}
-.proj.open .chev{transform:rotate(45deg)}
-@media (prefers-reduced-motion: reduce){.proj .chev{transition:none}}
-@media (max-width:760px){
-  .proj button.row{grid-template-columns:1fr 1.5rem;gap:.35rem 1rem}
-  .proj .sum{grid-column:1;grid-row:2}
-  .proj .cat{display:none}
-  .proj .chev{grid-column:2;grid-row:1}
-}
-.proj .more{padding:0 .25rem 1.5rem;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1.8fr) 7.5rem 1.5rem;gap:1.25rem}
-.proj .more > div{grid-column:2 / span 2}
-.proj .more[hidden]{display:none}
-@media (max-width:760px){.proj .more{grid-template-columns:1fr}.proj .more > div{grid-column:1}}
-.proj .more p{margin:0 0 .75rem;max-width:60ch}
 .chips{display:flex;flex-wrap:wrap;gap:.4rem;list-style:none;padding:0;margin:0}
 .chips li{font-size:.82rem;padding:.2rem .6rem;border:1px solid var(--rule);border-radius:4px;background:var(--paper-2)}
-.status{font-size:.85rem;color:var(--signal);font-weight:600}
 
 /* Stack */
 /* Barre de filtres : reste accrochée sous la nav pendant tout le défilement de la page */
@@ -432,7 +404,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
     <div class="wrap">
       <div class="sec-head">
         <h2>Projets</h2>
-        <p>Projets d'école, de diplôme et personnels. Clique sur une ligne pour le détail.</p>
+        <p>Mon travail de diplôme, celui dont je peux parler en détail.</p>
       </div>
 
       <article class="feature" aria-labelledby="domoTitle">
@@ -471,15 +443,6 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
           </details>
         </div>
       </article>
-
-      <div class="filters" role="group" aria-label="Filtrer les projets">
-        <button type="button" data-f="all" aria-pressed="true">Tous</button>
-        <button type="button" data-f="infra" aria-pressed="false">Infrastructure</button>
-        <button type="button" data-f="iot" aria-pressed="false">IoT</button>
-        <button type="button" data-f="dev" aria-pressed="false">Développement</button>
-      </div>
-
-      <ul class="plist" id="plist"></ul>
     </div>
   </section>
 
@@ -659,43 +622,6 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
     if(bar.getBoundingClientRect().top<=navH+1){
       window.scrollTo({top:Math.max(0,window.scrollY+sg.getBoundingClientRect().top-navH-bar.offsetHeight-16)});
     }
-  })});
-
-  /* Projets */
-  var projects=[
-    {id:'proxmox',t:'Serveur Proxmox maison',s:'Serveur de virtualisation qui héberge tous mes services.',c:'infra',cl:'Infrastructure',
-     d:"Installation et administration d'un serveur Hitachi CR210H avec contrôleur MegaRAID. Stockage en LVM et RAID, plusieurs VM et conteneurs (Plex, Nextcloud, GitLab, hébergement web) et une configuration réseau avec plusieurs bridges.",
-     k:['Proxmox VE','MegaRAID','LVM','RAID','Nextcloud','GitLab','Réseau']},
-    {id:'ha',t:'Domotique de la maison',s:"Home Assistant, volets Zigbee et plans d'étage.",c:'infra',cl:'Infrastructure',st:'En cours',
-     d:"Refonte de la domotique familiale autour de Home Assistant OS en VM sur Proxmox. Plex et un partage Samba en conteneurs LXC, coordinateur Zigbee réseau pour piloter les volets motorisés, et plans d'étage en SVG redessinés à partir des plans d'architecte au 1/50e.",
-     k:['Home Assistant','Zigbee2MQTT','LXC','Samba','Plex','SVG']},
-    {id:'coffer',t:'Portkey Coffer',s:'Coffre-fort connecté avec voix et reconnaissance faciale.',c:'iot',cl:'IoT',
-     d:"Projet d'école : un coffre qui s'ouvre par reconnaissance faciale et commande vocale (speech-to-text). Les éléments communiquent en MQTT, avec une API Flask côté serveur et du MicroPython sur le microcontrôleur.",
-     k:['MicroPython','MQTT','Flask','Reconnaissance faciale','Speech-to-text']},
-    {id:'pokedex',t:'Pokédex',s:'Application React et TypeScript testée avec Jest.',c:'dev',cl:'Développement',
-     d:"Projet d'examen : navigation avec React Router, état partagé via Context API et tests unitaires Jest.",
-     k:['React','TypeScript','React Router','Context API','Jest']}
-  ];
-  var list=document.getElementById('plist');
-  projects.forEach(function(p){
-    var li=document.createElement('li');li.className='proj';li.dataset.c=p.c;
-    li.innerHTML='<button class="row" type="button" aria-expanded="false" aria-controls="m-'+p.id+'">'+
-      '<h3>'+p.t+'</h3><span class="sum">'+p.s+'</span><span class="cat">'+p.cl+'</span><span class="chev" aria-hidden="true">+</span></button>'+
-      '<div class="more" id="m-'+p.id+'" hidden><div><p>'+p.d+'</p>'+(p.st?'<p class="status">'+p.st+'</p>':'')+
-      '<ul class="chips">'+p.k.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul></div></div>';
-    var b=li.querySelector('button'), m=li.querySelector('.more');
-    b.addEventListener('click',function(){
-      var open=b.getAttribute('aria-expanded')==='true';
-      b.setAttribute('aria-expanded',String(!open)); m.hidden=open; li.classList.toggle('open',!open);
-    });
-    list.appendChild(li);
-  });
-  var fbtns=document.querySelectorAll('.filters:not(.sfilters) button');
-  fbtns.forEach(function(b){b.addEventListener('click',function(){
-    fbtns.forEach(function(x){x.setAttribute('aria-pressed','false')});
-    b.setAttribute('aria-pressed','true');
-    var f=b.dataset.f;
-    list.querySelectorAll('.proj').forEach(function(li){li.hidden=!(f==='all'||li.dataset.c===f)});
   })});
 
   /* Topologie animée. Deux dispositions : large, et verticale quand la carte est étroite. */
