@@ -672,24 +672,9 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
     {id:'coffer',t:'Portkey Coffer',s:'Coffre-fort connecté avec voix et reconnaissance faciale.',c:'iot',cl:'IoT',
      d:"Projet d'école : un coffre qui s'ouvre par reconnaissance faciale et commande vocale (speech-to-text). Les éléments communiquent en MQTT, avec une API Flask côté serveur et du MicroPython sur le microcontrôleur.",
      k:['MicroPython','MQTT','Flask','Reconnaissance faciale','Speech-to-text']},
-    {id:'gitlab',t:'Migration GitLab',s:"54 projets déplacés d'une instance privée vers GitLab.com.",c:'infra',cl:'Infrastructure',
-     d:"Migration de 54 dépôts depuis le GitLab auto-hébergé de l'école vers GitLab.com.",
-     k:['GitLab','Git','Migration']},
-    {id:'kb',t:'kb-sysman',s:'Comparatif documenté entre Proxmox et VMware ESXi.',c:'infra',cl:'Infrastructure',
-     d:"Base de connaissances réalisée au CFPT sur les deux hyperviseurs : installation, fonctionnalités, limites, et critères pour choisir selon le contexte.",
-     k:['Proxmox','VMware ESXi','Documentation']},
-    {id:'debian',t:'Debian 13 de zéro',s:"Installation bare-metal et durcissement d'un serveur.",c:'infra',cl:'Infrastructure',
-     d:"Préparation d'un examen d'installation sur machine physique : IP statique, SSH durci, pare-feu UFW et Fail2Ban. J'en ai tiré une fiche mémo réutilisable.",
-     k:['Debian 13','SSH','UFW','Fail2Ban']},
     {id:'pokedex',t:'Pokédex',s:'Application React et TypeScript testée avec Jest.',c:'dev',cl:'Développement',
      d:"Projet d'examen : navigation avec React Router, état partagé via Context API et tests unitaires Jest.",
-     k:['React','TypeScript','React Router','Context API','Jest']},
-    {id:'dl',t:'Gestionnaire de téléchargements',s:'Application de bureau en C#.',c:'dev',cl:'Développement',
-     d:"Application Windows pour gérer des téléchargements, avec choix de l'emplacement d'enregistrement par l'utilisateur.",
-     k:['C#','.NET','Windows']},
-    {id:'ply',t:'Visualisation 3D de fichiers PLY',s:'Lecture et affichage de modèles 3D.',c:'dev',cl:'Développement',
-     d:"Parsing du format PLY pour extraire la géométrie d'un modèle et l'afficher en 3D.",
-     k:['PLY','3D','Parsing']}
+     k:['React','TypeScript','React Router','Context API','Jest']}
   ];
   var list=document.getElementById('plist');
   projects.forEach(function(p){
