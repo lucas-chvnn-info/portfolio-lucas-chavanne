@@ -330,6 +330,11 @@ footer{background:var(--ink);color:color-mix(in srgb,var(--paper) 60%,transparen
 @keyframes sp-out{to{opacity:0;visibility:hidden}}
 @keyframes sp-skip{to{opacity:0;visibility:hidden}}
 footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+
+/* Révélation au défilement : les blocs apparaissent en douceur, un peu à la fois */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s cubic-bezier(.16,.8,.3,1),transform .7s cubic-bezier(.16,.8,.3,1)}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion: reduce){.reveal{opacity:1;transform:none;transition:none}}
 </style>
 </head>
 <body>
@@ -379,16 +384,16 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
 
   <section id="apropos">
     <div class="wrap">
-      <div class="sec-head">
+      <div class="sec-head reveal">
         <h2>À propos</h2>
       </div>
       <div class="about-grid">
-        <div>
+        <div class="reveal">
           <p>Je viens de terminer mon diplôme de technicien ES en informatique au CFPT Genève et je commence la HEG Genève en septembre 2026. Ce qui m'intéresse, c'est l'ensemble de la chaîne : choisir le matériel, écrire le firmware, faire circuler les données proprement et les rendre lisibles.</p>
           <p>La plupart de mes projets tournent sur mon propre serveur Proxmox. J'y héberge mon GitLab avec ses pipelines CI/CD, mes services multimédia et ma domotique.</p>
           <p>Mon travail de diplôme, Domo, est un système domotique complet, entièrement local et open source, conçu du câblage des capteurs jusqu'au déploiement automatisé.</p>
         </div>
-        <dl class="facts">
+        <dl class="facts reveal" style="transition-delay:120ms">
           <div><dt>Diplôme</dt><dd>Technicien ES en informatique, CFPT Genève</dd></div>
           <div><dt>Dès septembre 2026</dt><dd>Étudiant à la HEG Genève</dd></div>
           <div><dt>Région</dt><dd>Genève, frontière franco-suisse</dd></div>
@@ -402,12 +407,12 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
 <div class="page" data-page="projets" data-title="Projets · Lucas Chavanne" hidden>
   <section id="projets" class="page-title">
     <div class="wrap">
-      <div class="sec-head">
+      <div class="sec-head reveal">
         <h2>Projets</h2>
         <p>Mon travail de diplôme, celui dont je peux parler en détail.</p>
       </div>
 
-      <article class="feature" aria-labelledby="domoTitle">
+      <article class="feature reveal" aria-labelledby="domoTitle">
         <div class="feature-body">
           <span class="tag">Travail de diplôme (TPI)</span>
           <h3 id="domoTitle">Domo</h3>
@@ -451,7 +456,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
 <div class="page" data-page="stack" data-title="Stack technique · Lucas Chavanne" hidden>
   <section id="stack" class="page-title">
     <div class="wrap">
-      <div class="sec-head">
+      <div class="sec-head reveal">
         <h2>Stack technique</h2>
         <p>Les outils que j'utilise, avec ce que j'en fais concrètement.</p>
       </div>
@@ -473,21 +478,21 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
 <div class="page" data-page="parcours" data-title="Parcours · Lucas Chavanne" hidden>
   <section id="parcours" class="page-title">
     <div class="wrap">
-      <div class="sec-head">
+      <div class="sec-head reveal">
         <h2>Parcours</h2>
       </div>
       <ol class="timeline">
-        <li>
+        <li class="reveal">
           <span class="when">Apprentissage · 4 ans</span>
           <h3>CFC informaticien, développement d'applications</h3>
           <p>CFPT Genève. Bases de la programmation : algorithmique, bases de données, développement web et desktop.</p>
         </li>
-        <li>
+        <li class="reveal" style="transition-delay:120ms">
           <span class="when">Formation · 2 ans</span>
           <h3>CFPT Genève, technicien ES en informatique</h3>
           <p>Administration de serveurs Linux et Windows, virtualisation, réseaux, développement. Projets d'école dont le coffre connecté Portkey Coffer et un comparatif Proxmox et VMware ESXi. Stage chez Genève Roule, présenté ensuite en anglais lors de l'examen oral.</p>
         </li>
-        <li class="now">
+        <li class="now reveal" style="transition-delay:240ms">
           <span class="when">Dès septembre 2026 · 2 ans</span>
           <h3>HEG Genève, informatique de gestion</h3>
           <p>Entrée directe en 2<sup>e</sup> année grâce au diplôme ES, pour deux ans de formation. Actuellement en 2<sup>e</sup> année, en parallèle de mes projets d'infrastructure à la maison.</p>
@@ -500,9 +505,9 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
 
   <section id="contact" class="contact">
     <div class="wrap">
-      <h2>Contact</h2>
-      <p>Je suis ouvert aux stages, jobs étudiants et projets en administration système, IoT ou DevOps dans la région genevoise.</p>
-      <div class="contact-links">
+      <h2 class="reveal">Contact</h2>
+      <p class="reveal" style="transition-delay:80ms">Je suis ouvert aux stages, jobs étudiants et projets en administration système, IoT ou DevOps dans la région genevoise.</p>
+      <div class="contact-links reveal" style="transition-delay:160ms">
         <a class="btn btn-primary" href="mailto:lucas.chavanne.info@gmail.com">Écrire un e-mail</a>
         <a class="btn btn-ghost" href="https://github.com/lucas-chvnn-info" target="_blank" rel="noopener">Mon GitHub</a>
       </div>
@@ -544,6 +549,8 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
     navLinks.forEach(function(a){ if(a.dataset.nav===name) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
     if(name!==current) window.scrollTo(0,0);
     current=name;
+    /* La page qui vient de s'afficher peut avoir des blocs à révéler déjà dans le cadre */
+    if(window.__reveal) window.__reveal.kick();
   }
   window.addEventListener('hashchange',route); route();
 
@@ -601,9 +608,10 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
   sg.insertAdjacentHTML('beforebegin','<p class="legend"><i aria-hidden="true"></i>Outil du quotidien</p>');
   groups.forEach(function(gr){
     var b=document.createElement('button');b.type='button';b.dataset.g=gr.id;b.setAttribute('aria-pressed','false');b.textContent=gr.t;sf.appendChild(b);
-    var html='<div class="sgroup" data-g="'+gr.id+'"><div class="sgroup-head"><h3>'+gr.t+'</h3></div><ul class="sgrid">';
-    gr.items.forEach(function(it){
-      html+='<li class="tcard'+(it[2]?' key':'')+'"><span class="logo"><img src="assets/logos/'+it[3]+'.svg" alt="" width="24" height="24" loading="lazy"></span><span><b>'+it[0]+'</b><small>'+it[1]+'</small></span></li>';
+    var html='<div class="sgroup" data-g="'+gr.id+'"><div class="sgroup-head reveal"><h3>'+gr.t+'</h3></div><ul class="sgrid">';
+    gr.items.forEach(function(it,idx){
+      var delay=60+Math.min(idx,6)*45;
+      html+='<li class="tcard reveal'+(it[2]?' key':'')+'" style="transition-delay:'+delay+'ms"><span class="logo"><img src="assets/logos/'+it[3]+'.svg" alt="" width="24" height="24" loading="lazy"></span><span><b>'+it[0]+'</b><small>'+it[1]+'</small></span></li>';
     });
     sg.insertAdjacentHTML('beforeend',html+'</ul></div>');
   });
@@ -618,6 +626,48 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
       window.scrollTo({top:Math.max(0,window.scrollY+sg.getBoundingClientRect().top-navH-bar.offsetHeight-16)});
     }
   })});
+
+  /* Révélation au défilement : chaque bloc entre en douceur la première fois qu'il approche de l'écran */
+  (function(){
+    var pending=Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+    if(!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches){
+      pending.forEach(function(el){el.classList.add('in')}); return;
+    }
+    function reveal(el){
+      if(el.classList.contains('in')) return;
+      el.classList.add('in'); io.unobserve(el);
+      var i=pending.indexOf(el); if(i>-1) pending.splice(i,1);
+    }
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if(e.isIntersecting) reveal(e.target); });
+    },{rootMargin:'0px 0px -8% 0px',threshold:.12});
+    pending.forEach(function(el){io.observe(el)});
+    /* Filet de sécurité, indépendant de l'événement scroll (certains sauts programmatiques ou
+       anciens navigateurs ne le déclenchent pas) : un saut instantané (touche Fin, ancre,
+       restauration de scroll) peut passer sous le seuil de l'observateur sans jamais le franchir.
+       Cette boucle courte, qui s'arrête dès qu'il n'y a plus rien en attente, rattrape ces cas. */
+    var ticking=false, lastLen=-1, stableTicks=0;
+    function tick(){
+      ticking=false;
+      if(!pending.length) return;
+      for(var i=pending.length-1;i>=0;i--){
+        var el=pending[i];
+        /* offsetParent est nul pour un élément dans une page masquée (display:none) : sur cette page-là,
+           on laisse l'observateur/la boucle faire son travail normalement une fois qu'elle s'affiche. */
+        if(el.offsetParent!==null && el.getBoundingClientRect().top<innerHeight) reveal(el);
+      }
+      if(!pending.length) return;
+      stableTicks = pending.length===lastLen ? stableTicks+1 : 0;
+      lastLen=pending.length;
+      if(stableTicks>15) return; /* rien de nouveau depuis ~1,5s : on laisse le scroll/resize/la navigation relancer */
+      ticking=true; setTimeout(tick,100);
+    }
+    function kick(){ if(!ticking && pending.length){ ticking=true; stableTicks=0; setTimeout(tick,0); } }
+    kick();
+    window.addEventListener('scroll',kick,{passive:true});
+    window.addEventListener('resize',kick);
+    window.__reveal={kick:kick};
+  })();
 
   /* Topologie animée. Deux dispositions : large, et verticale quand la carte est étroite. */
   var NS='http://www.w3.org/2000/svg', svg=document.getElementById('topoSvg'), log=document.getElementById('log'), fig=svg.parentNode;
