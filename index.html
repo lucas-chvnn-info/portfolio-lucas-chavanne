@@ -549,8 +549,6 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
     navLinks.forEach(function(a){ if(a.dataset.nav===name) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
     if(name!==current) window.scrollTo(0,0);
     current=name;
-    /* La page qui vient de s'afficher peut avoir des blocs à révéler déjà dans le cadre */
-    if(window.__reveal) window.__reveal.kick();
   }
   window.addEventListener('hashchange',route); route();
 
@@ -627,46 +625,16 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
     }
   })});
 
-  /* Révélation au défilement : chaque bloc entre en douceur la première fois qu'il approche de l'écran */
+  /* Révélation au défilement : chaque bloc s'anime à chaque passage à l'écran, dans les deux sens */
   (function(){
-    var pending=Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+    var els=document.querySelectorAll('.reveal');
     if(!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches){
-      pending.forEach(function(el){el.classList.add('in')}); return;
-    }
-    function reveal(el){
-      if(el.classList.contains('in')) return;
-      el.classList.add('in'); io.unobserve(el);
-      var i=pending.indexOf(el); if(i>-1) pending.splice(i,1);
+      els.forEach(function(el){el.classList.add('in')}); return;
     }
     var io=new IntersectionObserver(function(entries){
-      entries.forEach(function(e){ if(e.isIntersecting) reveal(e.target); });
+      entries.forEach(function(e){ e.target.classList.toggle('in',e.isIntersecting); });
     },{rootMargin:'0px 0px -8% 0px',threshold:.12});
-    pending.forEach(function(el){io.observe(el)});
-    /* Filet de sécurité, indépendant de l'événement scroll (certains sauts programmatiques ou
-       anciens navigateurs ne le déclenchent pas) : un saut instantané (touche Fin, ancre,
-       restauration de scroll) peut passer sous le seuil de l'observateur sans jamais le franchir.
-       Cette boucle courte, qui s'arrête dès qu'il n'y a plus rien en attente, rattrape ces cas. */
-    var ticking=false, lastLen=-1, stableTicks=0;
-    function tick(){
-      ticking=false;
-      if(!pending.length) return;
-      for(var i=pending.length-1;i>=0;i--){
-        var el=pending[i];
-        /* offsetParent est nul pour un élément dans une page masquée (display:none) : sur cette page-là,
-           on laisse l'observateur/la boucle faire son travail normalement une fois qu'elle s'affiche. */
-        if(el.offsetParent!==null && el.getBoundingClientRect().top<innerHeight) reveal(el);
-      }
-      if(!pending.length) return;
-      stableTicks = pending.length===lastLen ? stableTicks+1 : 0;
-      lastLen=pending.length;
-      if(stableTicks>15) return; /* rien de nouveau depuis ~1,5s : on laisse le scroll/resize/la navigation relancer */
-      ticking=true; setTimeout(tick,100);
-    }
-    function kick(){ if(!ticking && pending.length){ ticking=true; stableTicks=0; setTimeout(tick,0); } }
-    kick();
-    window.addEventListener('scroll',kick,{passive:true});
-    window.addEventListener('resize',kick);
-    window.__reveal={kick:kick};
+    els.forEach(function(el){io.observe(el)});
   })();
 
   /* Topologie animée. Deux dispositions : large, et verticale quand la carte est étroite. */
