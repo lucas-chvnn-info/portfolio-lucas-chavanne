@@ -247,6 +247,25 @@ details.learn li{margin-bottom:.45rem}
 }
 .filters button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .chips{display:flex;flex-wrap:wrap;gap:.4rem;list-style:none;padding:0;margin:0}
+
+/* Projets perso : cartes plus légères que Domo, liens en bas de carte */
+.pgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:1rem;list-style:none;margin:0;padding:0}
+@media (min-width:720px){.pgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.pgrid > :last-child:nth-child(odd){grid-column:1/-1}}
+@media (min-width:1040px){.pgrid{grid-template-columns:repeat(3,minmax(0,1fr))}.pgrid > :last-child:nth-child(odd){grid-column:auto}}
+.pcard{
+  background:var(--node);border:1px solid var(--rule);border-radius:14px;
+  padding:clamp(1.25rem,2.5vw,1.6rem);display:flex;flex-direction:column;gap:.9rem;
+}
+.pcard-meta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.4rem .75rem}
+.pcard .tag{margin:0}
+.pcard-where{font-size:.78rem;color:var(--signal)}
+.pcard h3{font-size:1.6rem;font-weight:800;font-variation-settings:"wdth" 120}
+.pcard p{margin:0}
+.pcard ul.points{margin:0;padding-left:1.1rem;font-size:.95rem}
+.pcard ul.points li{margin-bottom:.35rem}
+.pcard-links{margin-top:auto;padding-top:.4rem;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.pcard-links .btn{padding:.55rem 1rem;font-size:.92rem}
+.pcard-note{font-size:.87rem;color:var(--ink-soft)}
 .chips li{font-size:.82rem;padding:.2rem .6rem;border:1px solid var(--rule);border-radius:4px;background:var(--paper-2)}
 
 /* Stack */
@@ -409,7 +428,7 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
     <div class="wrap">
       <div class="sec-head reveal">
         <h2>Projets</h2>
-        <p>Mon travail de diplôme, celui dont je peux parler en détail.</p>
+        <p>Mon travail de diplôme en détail, puis les outils que je construis pour mon propre usage.</p>
       </div>
 
       <article class="feature reveal" aria-labelledby="domoTitle">
@@ -448,6 +467,60 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem
           </details>
         </div>
       </article>
+
+      <div class="sgroup-head reveal"><h3>Projets perso</h3></div>
+      <ul class="pgrid">
+        <li class="pcard reveal">
+          <div class="pcard-meta"><span class="tag">App iOS</span><span class="pcard-where mono">iOS 17 · Bluetooth LE</span></div>
+          <h3>LED Car Control</h3>
+          <p>Une app iPhone pour piloter les LED de ma voiture en Bluetooth, à la place de l'app générique livrée avec le contrôleur.</p>
+          <ul class="points">
+            <li>Couleur, luminosité et allumage pour les deux protocoles les plus répandus (Triones, ELK-BLEDOM)</li>
+            <li>Commandes Siri et Raccourcis : «&nbsp;Allume les LED&nbsp;», «&nbsp;Mets les LED en bleu&nbsp;»</li>
+            <li>Plusieurs contrôleurs enregistrés sous un nom, avec bascule rapide</li>
+            <li>Écran de diagnostic et envoi de trames hex pour décoder un protocole inconnu</li>
+          </ul>
+          <ul class="chips" aria-label="Technologies">
+            <li>Swift</li><li>SwiftUI</li><li>Core Bluetooth</li><li>App Intents</li>
+          </ul>
+          <div class="pcard-links"><span class="pcard-note">Usage perso, pas publiée sur l'App Store.</span></div>
+        </li>
+        <li class="pcard reveal" style="transition-delay:100ms">
+          <div class="pcard-meta"><span class="tag">PWA</span><span class="pcard-where mono">recettes.lucas-chvnn.ch</span></div>
+          <h3>Mes recettes</h3>
+          <p>Mon carnet de recettes, installable sur le téléphone. J'ajoute une recette directement en cuisine, avec sa photo, sa note et ses étapes.</p>
+          <ul class="points">
+            <li>Installable sur iPhone et Android, avec service worker</li>
+            <li>Ingrédients choisis dans une liste déroulante, étapes numérotées</li>
+            <li>Fonctions serverless Vercel et stockage Vercel Blob privé</li>
+            <li>Lecture libre, écriture protégée par mot de passe et jeton HMAC</li>
+          </ul>
+          <ul class="chips" aria-label="Technologies">
+            <li>JavaScript</li><li>PWA</li><li>Node.js</li><li>Vercel Functions</li><li>Vercel Blob</li>
+          </ul>
+          <div class="pcard-links">
+            <a class="btn btn-primary" href="https://recettes.lucas-chvnn.ch" target="_blank" rel="noopener">Voir le site ↗</a>
+          </div>
+        </li>
+        <li class="pcard reveal" style="transition-delay:200ms">
+          <div class="pcard-meta"><span class="tag">Site web</span><span class="pcard-where mono">photo.lucas-chvnn.ch</span></div>
+          <h3>Galerie photos</h3>
+          <p>Ma galerie de photos, surtout des voitures et des lieux. Une IA qui tourne sur mon Mac analyse chaque photo : marque, modèle et génération pour une voiture, endroit pour un paysage.</p>
+          <ul class="points">
+            <li>IA de vision locale et gratuite (Ollama, Qwen3-VL), sans API payante</li>
+            <li>Photos classées par thème et placées sur une carte grâce au GPS</li>
+            <li>Admin locale : ajout, correction, puis «&nbsp;Publier&nbsp;» pousse sur GitHub et Vercel</li>
+            <li>Images redimensionnées et nettoyées de leurs métadonnées EXIF</li>
+          </ul>
+          <ul class="chips" aria-label="Technologies">
+            <li>Node.js</li><li>Express</li><li>Ollama</li><li>sharp</li><li>Leaflet</li><li>Vercel</li>
+          </ul>
+          <div class="pcard-links">
+            <a class="btn btn-primary" href="https://photo.lucas-chvnn.ch" target="_blank" rel="noopener">Voir le site ↗</a>
+            <a class="btn btn-ghost" href="https://github.com/lucas-chvnn-info/photos-lucas-chavanne" target="_blank" rel="noopener">Code source</a>
+          </div>
+        </li>
+      </ul>
     </div>
   </section>
 
