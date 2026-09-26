@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lucas Chavanne · Systems, IoT and self-hosting</title>
+<meta name="description" content="Portfolio of Lucas Chavanne, IT technician (ES) and student at HEG Geneva: system administration, Proxmox, IoT on Raspberry Pi and Pico 2W, InfluxDB and Grafana.">
+<link rel="canonical" href="https://lucas-chvnn.ch/en/">
+<link rel="alternate" hreflang="fr" href="https://lucas-chvnn.ch/">
+<link rel="alternate" hreflang="en" href="https://lucas-chvnn.ch/en/">
+<link rel="alternate" hreflang="x-default" href="https://lucas-chvnn.ch/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="en_GB">
+<meta property="og:locale:alternate" content="fr_CH">
+<meta property="og:site_name" content="Lucas Chavanne">
+<meta property="og:title" content="Lucas Chavanne · Systems, IoT and self-hosting">
+<meta property="og:description" content="IT technician (ES), student at HEG Geneva. System administration, IoT and data: from the Pico to the Grafana dashboard.">
+<meta property="og:url" content="https://lucas-chvnn.ch/en/">
+<meta property="og:image" content="https://lucas-chvnn.ch/assets/og-en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Lucas Chavanne, IT technician (ES). Systems, IoT and self-hosting.">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Person","name":"Lucas Chavanne","url":"https://lucas-chvnn.ch/en/","jobTitle":"IT technician (ES)","address":{"@type":"PostalAddress","addressLocality":"Geneva","addressCountry":"CH"},"alumniOf":{"@type":"EducationalOrganization","name":"CFPT Geneva"},"sameAs":["https://github.com/lucas-chvnn-info"],"knowsAbout":["System administration","Proxmox virtualisation","IoT","MQTT","InfluxDB","Grafana"]}
+</script>
+<meta name="theme-color" content="#EEF1F4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111112" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9' fill='%23C51A4A'/%3E%3C/svg%3E">
+<script>
+/* Avant le premier rendu : thème enregistré, et splash une seule fois par session */
+(function(){
+  var d=document.documentElement;
+  d.classList.add('js'); /* sans JavaScript, tout le contenu reste visible : voir les règles html:not(.js) */
+  try{var t=localStorage.getItem('theme'); if(t) d.setAttribute('data-theme',t);}catch(e){}
+  try{
+    if(!sessionStorage.getItem('splash') && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+      d.classList.add('has-splash'); sessionStorage.setItem('splash','1');
+    }
+  }catch(e){}
+})();
+</script>
+<link rel="preload" href="/assets/fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
+</head>
+<body>
+
+<div id="splash" aria-hidden="true">
+  <div class="sp-inner">
+    <div class="sp-brand"><span class="brand-dot"></span>Lucas Chavanne</div>
+    <div class="sp-wire"><i class="sp-pkt"></i></div>
+    <div class="sp-log mono"><span class="t">portfolio/home</span><span>connected</span></div>
+  </div>
+</div>
+
+<a class="skip" href="#top" id="skip">Skip to content</a>
+
+<nav class="nav" aria-label="Main navigation">
+  <div class="wrap">
+    <a href="#/" class="brand"><span class="brand-dot" aria-hidden="true"></span>Lucas Chavanne</a>
+    <ul>
+      <li><a href="#/" data-nav="accueil">Home</a></li>
+      <li><a href="#/projects" data-nav="projets">Projects</a></li>
+      <li><a href="#/stack" data-nav="stack">Stack</a></li>
+      <li><a href="#/background" data-nav="parcours">Background</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-tools">
+      <a class="lang" id="langLink" href="/" hreflang="fr" lang="fr" title="Version française" aria-label="Lire ce site en français">FR</a>
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle theme">◐</button>
+    </div>
+  </div>
+</nav>
+
+<main id="top" tabindex="-1">
+<div class="page" data-page="accueil" data-title="Lucas Chavanne · Systems, IoT and self-hosting">
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <h1>Lucas Chavanne<span>IT technician (ES), Geneva</span></h1>
+        <p class="lede">I build systems that run at home, cloud-free: from a sensor wired to a Pico all the way to the Grafana dashboard, through the Proxmox server that hosts it all.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#/projects">See the projects</a>
+          <a class="btn btn-ghost" href="https://github.com/lucas-chvnn-info" target="_blank" rel="noopener">GitHub</a>
+        </div>
+      </div>
+
+      <figure class="topo" aria-labelledby="topoCap">
+        <div class="topo-head"><span id="topoCap"><strong>Domo</strong>, the data flow of my diploma project</span><span>simulation</span></div>
+        <svg id="topoSvg" viewBox="0 0 600 420" role="img" aria-label="Domo architecture: the Pico 2W, the Pi Zero 2W and the Shelly plugs publish to the Mosquitto broker on the Raspberry Pi 5, which feeds Telegraf, InfluxDB and Grafana, as well as the Flask API that sends alerts via ntfy."></svg>
+        <div class="log mono" id="log" aria-hidden="true"></div>
+      </figure>
+    </div>
+  </header>
+
+  <section id="apropos">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <h2>About</h2>
+      </div>
+      <div class="about-grid">
+        <div class="reveal">
+          <p>I graduated as an IT technician (ES) from CFPT Geneva, and I now study business information technology at HEG Geneva, in my 2<sup>nd</sup> year. What interests me is the whole chain: choosing the hardware, writing the firmware, moving data around cleanly and making it readable.</p>
+          <p>Most of my projects run on my own Proxmox server. It hosts my GitLab with its CI/CD pipelines, my media services and my home automation.</p>
+          <p>My diploma project, Domo, is a complete home automation system, fully local and open source, designed from the wiring of the sensors all the way to automated deployment.</p>
+        </div>
+        <dl class="facts reveal" style="transition-delay:120ms">
+          <div><dt>Diploma</dt><dd>IT technician (ES), CFPT Geneva</dd></div>
+          <div><dt>Currently</dt><dd>2<sup>nd</sup> year of business information technology, HEG Geneva</dd></div>
+          <div><dt>Region</dt><dd>Geneva, on the French–Swiss border</dd></div>
+          <div><dt>Areas</dt><dd>Linux servers, virtualisation, IoT, time-series data</dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="page" data-page="projets" data-title="Projects · Lucas Chavanne" hidden>
+  <section id="projets" class="page-title">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <h1>Projects</h1>
+        <p>My diploma project in detail, then the tools I build for my own use.</p>
+      </div>
+
+      <article class="feature reveal" aria-labelledby="domoTitle">
+        <div class="feature-body">
+          <span class="tag">Diploma project (TPI)</span>
+          <h3 id="domoTitle" aria-level="2">Domo</h3>
+          <p>A fully local, open-source home automation system. Sensors on Pico 2W and Pi Zero 2W publish their measurements over MQTT to a Raspberry Pi 5 that stores, displays and reacts, with no cloud service at all.</p>
+          <ul class="points">
+            <li>Light, sound, water-leak and motion sensors, with camera capture on detection</li>
+            <li>Shelly plugs controlled and metered from the same interface</li>
+            <li>Remote firmware updates for the Picos (OTA)</li>
+            <li>Phone alerts via ntfy</li>
+            <li>GitLab CI pipeline for testing and deployment</li>
+          </ul>
+          <ul class="chips" aria-label="Technologies">
+            <li>Raspberry Pi 5</li><li>Pico 2W</li><li>MicroPython</li><li>Mosquitto</li><li>Telegraf</li><li>InfluxDB</li><li>Grafana</li><li>Flask</li><li>GitLab CI</li>
+          </ul>
+          <div class="pcard-links">
+            <a class="btn btn-primary" href="https://github.com/lucas-chvnn-info/domo" target="_blank" rel="noopener">Source code on GitHub ↗</a>
+          </div>
+        </div>
+        <div class="feature-side">
+          <h4 aria-level="3">The journey of a measurement</h4>
+          <ol class="flow">
+            <li><b>Sensor</b><span>The Pico 2W reads the sensor and publishes to an MQTT topic.</span></li>
+            <li><b>Broker</b><span>Mosquitto on the Pi 5 receives and redistributes.</span></li>
+            <li><b>Storage</b><span>Telegraf writes the measurement into InfluxDB.</span></li>
+            <li><b>Display</b><span>Grafana plots the history in real time.</span></li>
+            <li><b>Reaction</b><span>The Flask API triggers the action or the ntfy alert.</span></li>
+          </ol>
+          <details class="learn">
+            <summary>What the hardware taught me</summary>
+            <ul>
+              <li>The Pi's 3V3 pin tops out around 300 mA: beyond that, an external regulator is needed.</li>
+              <li>The Pico's Wi-Fi transmission spikes need a 470 µF and a 100 nF capacitor to stay stable.</li>
+              <li>A simple NPN transistor and a resistor are enough to drive a fan, no relay needed.</li>
+              <li>The Camera Module 3 is not detected on its own: you have to force the imx708 overlay.</li>
+            </ul>
+          </details>
+        </div>
+      </article>
+
+      <div class="sgroup-head reveal"><h3 aria-level="2">Personal projects</h3></div>
+      <ul class="pgrid">
+        <li class="pcard reveal">
+          <div class="pcard-meta"><span class="tag">iOS app</span><span class="pcard-where mono">iOS 17 · Bluetooth LE</span></div>
+          <h3>LED Car Control</h3>
+          <p>An iPhone app to control my car's LED strips over Bluetooth, instead of the generic app shipped with the controller.</p>
+          <ul class="points">
+            <li>Colour, brightness and power for the two most common protocols (Triones, ELK-BLEDOM)</li>
+            <li>Siri and Shortcuts commands: “Turn on the LEDs”, “Set the LEDs to blue”</li>
+            <li>Several controllers saved under a name, with quick switching</li>
+            <li>Diagnostics screen and raw hex frame sending to reverse-engineer an unknown protocol</li>
+          </ul>
+          <ul class="chips" aria-label="Technologies">
+            <li>Swift</li><li>SwiftUI</li><li>Core Bluetooth</li><li>App Intents</li>
+          </ul>
+          <div class="pcard-links"><span class="pcard-note">For personal use, not published on the App Store.</span></div>
+        </li>
+        <li class="pcard reveal" style="transition-delay:100ms">
+          <div class="pcard-meta"><span class="tag">PWA</span><span class="pcard-where mono">recettes.lucas-chvnn.ch</span></div>
+          <h3>My recipes</h3>
+          <p>My recipe notebook, installable on a phone. I add a recipe right in the kitchen, with its photo, rating and steps.</p>
+          <ul class="points">
+            <li>Installable on iPhone and Android, with a service worker</li>
+            <li>Ingredients picked from a dropdown, numbered steps</li>
+            <li>Vercel serverless functions and private Vercel Blob storage</li>
+            <li>Open to read, write access protected by a password and an HMAC token</li>
+          </ul>
+          <ul class="chips" aria-label="Technologies">
+            <li>JavaScript</li><li>PWA</li><li>Node.js</li><li>Vercel Functions</li><li>Vercel Blob</li>
+          </ul>
+          <div class="pcard-links">
+            <a class="btn btn-primary" href="https://recettes.lucas-chvnn.ch" target="_blank" rel="noopener">Visit the site ↗</a>
+          </div>
+        </li>
+        <li class="pcard reveal" style="transition-delay:200ms">
+          <div class="pcard-meta"><span class="tag">Website</span><span class="pcard-where mono">photos.lucas-chvnn.ch</span></div>
+          <h3>Photo gallery</h3>
+          <p>My photo gallery, mostly cars and places. An AI running on my Mac analyses each photo: make, model and generation for a car, location for a landscape.</p>
+          <ul class="points">
+            <li>Local, free vision AI (Ollama, Qwen3-VL), no paid API</li>
+            <li>Photos sorted by theme and placed on a map using GPS</li>
+            <li>Local admin: add, fix, then “Publish” pushes to GitHub and Vercel</li>
+            <li>Images resized and stripped of their EXIF metadata</li>
+          </ul>
+          <ul class="chips" aria-label="Technologies">
+            <li>Node.js</li><li>Express</li><li>Ollama</li><li>sharp</li><li>Leaflet</li><li>Vercel</li>
+          </ul>
+          <div class="pcard-links">
+            <a class="btn btn-primary" href="https://photos.lucas-chvnn.ch" target="_blank" rel="noopener">Visit the site ↗</a>
+            <a class="btn btn-ghost" href="https://github.com/lucas-chvnn-info/photos-lucas-chavanne" target="_blank" rel="noopener">Source code</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+</div>
+
+<div class="page" data-page="stack" data-title="Tech stack · Lucas Chavanne" hidden>
+  <section id="stack" class="page-title">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <h1>Tech stack</h1>
+        <p>The tools I use, and what I actually do with them.</p>
+      </div>
+    </div>
+    <div class="sbar">
+      <div class="wrap">
+        <div class="sfilters filters" role="group" aria-label="Filter the stack">
+          <button type="button" data-g="all" aria-pressed="true">All</button>
+        </div>
+      </div>
+    </div>
+    <div class="wrap">
+      <noscript><p class="noscript">The tool list is generated by JavaScript. It stays empty while JavaScript is disabled.</p></noscript>
+      <div id="stackGrid"></div>
+    </div>
+  </section>
+
+</div>
+
+<div class="page" data-page="parcours" data-title="Background · Lucas Chavanne" hidden>
+  <section id="parcours" class="page-title">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <h1>Background</h1>
+      </div>
+      <ol class="timeline">
+        <li class="reveal">
+          <span class="when">Apprenticeship · 4 years</span>
+          <h3 aria-level="2">Federal VET Diploma (CFC) in IT, application development</h3>
+          <p>CFPT Geneva. Programming fundamentals: algorithms, databases, web and desktop development.</p>
+        </li>
+        <li class="reveal" style="transition-delay:120ms">
+          <span class="when">Training · 2 years</span>
+          <h3 aria-level="2">CFPT Geneva, IT technician (ES)</h3>
+          <p>Linux and Windows server administration, virtualisation, networking, development. School projects including the connected safe Portkey Coffer and a Proxmox vs VMware ESXi comparison. Internship at Genève Roule, later presented in English for the oral exam.</p>
+        </li>
+        <li class="now reveal" style="transition-delay:240ms">
+          <span class="when">From September 2026 · 2 years</span>
+          <h3 aria-level="2">HEG Geneva, business information technology</h3>
+          <p>Direct entry into the 2<sup>nd</sup> year thanks to the ES diploma, for two years of study. Currently in the 2<sup>nd</sup> year, alongside my infrastructure projects at home.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+</div>
+
+  <section id="contact" class="contact">
+    <div class="wrap">
+      <h2 class="reveal">Contact</h2>
+      <p class="reveal" style="transition-delay:80ms">I'm open to internships, student jobs and projects in system administration, IoT or DevOps in the Geneva area.</p>
+      <div class="contact-links reveal" style="transition-delay:160ms">
+        <a class="btn btn-primary" href="mailto:lucas.chavanne.info@gmail.com">Send an email</a>
+        <a class="btn btn-ghost" href="https://github.com/lucas-chvnn-info" target="_blank" rel="noopener">My GitHub</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Lucas Chavanne, 2026</span>
+    <a href="https://github.com/lucas-chvnn-info/portfolio-lucas-chavanne" target="_blank" rel="noopener">Source code of this site ↗</a>
+  </div>
+</footer>
+
+<script src="/assets/i18n.js"></script>
+<script src="/assets/site.js"></script>
+</body>
+</html>

@@ -8,8 +8,10 @@ pipelines de données InfluxDB / Telegraf / Grafana.
 
 ## Technique
 
-- Un seul fichier `index.html` : HTML, CSS et JavaScript sans framework ni build
-- Navigation en pages via le hash de l'URL (`#/projets`, `#/stack`, `#/parcours`)
+- Sans framework ni build : du HTML, du CSS et du JavaScript écrits à la main
+- Deux langues, deux pages statiques : `index.html` (français, `/`) et `en/index.html` (anglais, `/en/`), chacune avec ses propres balises de partage et son `hreflang`. Le CSS (`assets/site.css`) et le JavaScript (`assets/site.js`) sont communs, les textes générés par le script sont dans `assets/i18n.js`
+- Adresses traduites : `#/projets`, `#/parcours` en français, `#/projects`, `#/background` en anglais. Le bouton FR/EN de la barre mène à la même page dans l'autre langue
+- Navigation en pages via le hash de l'URL
 - Thème clair / sombre, responsive (testé de 320 px à 1280 px), respect de `prefers-reduced-motion`
 - Barre de défilement personnalisée, qui suit le thème (framboise au survol)
 - Splash d'ouverture affiché une fois par session, ignorable au clic ou à une touche, absent si le mouvement réduit est demandé
@@ -22,6 +24,10 @@ pipelines de données InfluxDB / Telegraf / Grafana.
 - Référencement et partage : balises Open Graph avec image (`assets/og.png`), données structurées `Person`, `robots.txt`, `sitemap.xml`, page 404
 - En-têtes de sécurité et cache configurés dans `vercel.json`
 - Déployé sur Vercel, redéploiement automatique à chaque push sur `main`
+
+## Modifier le contenu
+
+Un changement de texte se fait dans les **deux** fichiers HTML (`index.html` et `en/index.html`). Les descriptions de la page Stack et les libellés du schéma de l'accueil sont dans `assets/i18n.js`, un bloc `fr` et un bloc `en`. Un changement de style ou de comportement se fait une seule fois, dans `assets/site.css` ou `assets/site.js`.
 
 ## Lancer en local
 

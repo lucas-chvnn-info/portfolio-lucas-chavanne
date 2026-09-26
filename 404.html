@@ -27,6 +27,9 @@ main{width:min(34rem,100%)}
 .dot{width:10px;height:10px;border-radius:50%;background:var(--raspberry)}
 h1{margin:.75rem 0 1rem;font-size:clamp(2.4rem,9vw,4rem);line-height:1;font-weight:800;font-variation-settings:"wdth" 125;letter-spacing:-.02em}
 p{margin:0 0 2rem;color:var(--ink-soft)}
+p.en{margin:2rem 0 0;font-size:.95rem}
+a.plain{display:inline;padding:0;border:0;background:none;color:var(--ink);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+a.plain:hover{background:none;color:var(--raspberry)}
 a{display:inline-flex;padding:.8rem 1.25rem;border-radius:6px;border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);font-weight:600;text-decoration:none;transition:background-color .15s ease,border-color .15s ease}
 a:hover{background:var(--raspberry);border-color:var(--raspberry)}
 a:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
@@ -38,6 +41,7 @@ a:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
   <h1>Page introuvable</h1>
   <p>Cette adresse ne correspond à rien sur ce site. Elle a peut-être changé, ou contient une faute de frappe.</p>
   <a href="/">Retour à l'accueil</a>
+  <p class="en" lang="en">Page not found. This address doesn't match anything on this site. <a class="plain" href="/en/">Back to the English site</a></p>
 </main>
 </body>
 </html>
